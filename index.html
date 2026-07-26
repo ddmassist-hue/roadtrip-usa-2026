@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LA → Miami · Кэмпер 2026</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12161d">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#12161d;
+    --bg-panel:#1b222c;
+    --bg-raised:#252e3b;
+    --bg-raised2:#2d3849;
+    --line:#333f50;
+    --amber:#e8a94b;
+    --amber-dim:#a97a3a;
+    --rust:#c1592e;
+    --sage:#7c9473;
+    --sage-dim:#4f6349;
+    --warn:#c1592e;
+    --text:#f3eee3;
+    --text-dim:#98a1af;
+    --text-dimmer:#636e7d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg-deep);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--amber);color:#14181f;}
+
+  h1,h2,h3,.display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  a{color:var(--amber);}
+
+  /* ===== HEADER / SIGN BOARD ===== */
+  .header{
+    background:linear-gradient(180deg,#171d26,#12161d 90%);
+    border-bottom:3px solid var(--amber);
+    padding:28px 20px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .header::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(90deg, transparent 0 38px, rgba(232,169,75,0.05) 38px 40px);
+    pointer-events:none;
+  }
+  .header-inner{max-width:920px;margin:0 auto;position:relative;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.15em;color:var(--amber);text-transform:uppercase;}
+  h1.title{font-size:clamp(28px,6vw,44px);margin:6px 0 2px;line-height:1.02;color:var(--text);}
+  .subtitle{color:var(--text-dim);font-size:14px;margin-bottom:18px;}
+
+  .odometer{
+    display:flex; align-items:center; gap:14px;
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin-top:6px;
+  }
+  .odo-num{font-family:'Oswald'; font-size:34px; font-weight:600; color:var(--amber); min-width:52px; text-align:center;}
+  .odo-track{flex:1; height:8px; background:#0e1218; border-radius:4px; position:relative; overflow:hidden;}
+  .odo-fill{position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,var(--rust),var(--amber)); border-radius:4px;}
+  .odo-labels{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dimmer); margin-top:6px; font-family:'JetBrains Mono';}
+  .odo-side{font-size:13px;color:var(--text-dim);}
+  .odo-side b{color:var(--text);}
+
+  /* ===== NAV ===== */
+  nav{
+    max-width:920px;margin:18px auto 0; padding:0 20px;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  nav button{
+    font-family:'Oswald'; text-transform:uppercase; letter-spacing:0.04em;
+    background:var(--bg-panel); color:var(--text-dim); border:1px solid var(--line);
+    padding:10px 18px; border-radius:999px; cursor:pointer; font-size:14px;
+    transition:all .15s ease;
+  }
+  nav button:hover{color:var(--text); border-color:var(--amber-dim);}
+  nav button.active{background:var(--amber); color:#14181f; border-color:var(--amber);}
+  nav button:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+
+  main{max-width:920px; margin:0 auto; padding:24px 20px 80px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  section.block{margin-bottom:28px;}
+  h2.section-title{font-size:15px; color:var(--text-dimmer); letter-spacing:0.12em; margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+
+  /* ===== ROUTE / DAY TIMELINE ===== */
+  .day{
+    display:flex; gap:16px; padding:16px 0; border-top:1px solid var(--line);
+    position:relative;
+  }
+  .day:first-child{border-top:none;}
+  .day-marker{
+    flex-shrink:0; width:52px; text-align:center; padding-top:2px;
+  }
+  .day-done-btn{
+    margin:6px auto 0; width:22px; height:22px; border-radius:50%; border:2px solid var(--text-dimmer);
+    background:var(--bg-panel); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .15s;
+  }
+  .day-done-btn svg{width:12px; height:12px; opacity:0; stroke:#14181f;}
+  .day.done .day-done-btn{background:var(--sage); border-color:var(--sage);}
+  .day.done .day-done-btn svg{opacity:1;}
+  .day.done{opacity:0.45;}
+  .day.done .day-title, .day.done .day-num{color:var(--text-dimmer);}
+  .day.done:hover{opacity:0.7;}
+  .day-num{font-family:'Oswald'; font-size:22px; font-weight:600; color:var(--amber);}
+  .day-marker-line{width:2px; background:var(--line); flex:1; margin:6px auto 0;}
+  .day-content{flex:1; padding-bottom:4px; cursor:pointer;}
+  .day-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--text-dimmer); text-transform:uppercase;}
+  .day-title{font-family:'Oswald'; font-size:18px; margin:2px 0 4px; color:var(--text);}
+  .day-summary{color:var(--text-dim); font-size:13.5px; line-height:1.5;}
+  .day-detail{
+    display:none; margin-top:12px; padding:14px; background:var(--bg-panel); border-radius:8px;
+    border-left:3px solid var(--amber-dim); font-size:13.5px; line-height:1.65; color:var(--text-dim);
+  }
+  .day.open .day-detail{display:block;}
+  .day-detail b{color:var(--text);}
+  .day-detail .addr{font-family:'JetBrains Mono'; font-size:12px; color:var(--amber); display:block; margin-top:2px;}
+  .tag{display:inline-block; font-family:'JetBrains Mono'; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:4px; margin-left:8px; vertical-align:middle;}
+  .tag.booked{background:rgba(124,148,115,0.18); color:var(--sage); border:1px solid var(--sage-dim);}
+  .tag.pending{background:rgba(232,169,75,0.15); color:var(--amber); border:1px solid var(--amber-dim);}
+  .tag.risk{background:rgba(193,89,46,0.18); color:#e2895e; border:1px solid var(--rust);}
+
+  /* ===== BOOKINGS ===== */
+  .booking-grid{display:grid; grid-template-columns:1fr; gap:12px;}
+  @media(min-width:640px){.booking-grid{grid-template-columns:1fr 1fr;}}
+  .card{
+    background:var(--bg-panel); border-radius:10px; padding:16px; border-left:4px solid var(--line);
+  }
+  .card.ok{border-left-color:var(--sage);}
+  .card.todo{border-left-color:var(--amber);}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .card-title{font-family:'Oswald'; font-size:16px; color:var(--text);}
+  .card-date{font-family:'JetBrains Mono'; font-size:11px; color:var(--text-dimmer); white-space:nowrap;}
+  .card-body{font-size:13px; color:var(--text-dim); margin-top:8px; line-height:1.6;}
+  .card-body .mono{color:var(--amber); font-size:12px;}
+  .status-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;}
+  .status-dot.ok{background:var(--sage);}
+  .status-dot.todo{background:var(--amber);}
+
+  /* ===== REFERENCE ===== */
+  .ref-card{background:var(--bg-panel); border-radius:10px; padding:16px; margin-bottom:12px;}
+  .ref-card h3{font-family:'Oswald'; font-size:15px; margin:0 0 10px; color:var(--amber); text-transform:none; letter-spacing:0;}
+  .ref-card p, .ref-card li{font-size:13.5px; color:var(--text-dim); line-height:1.65;}
+  .ref-card ul{margin:6px 0; padding-left:18px;}
+  .ref-card b{color:var(--text);}
+  .warn-box{background:rgba(193,89,46,0.12); border:1px solid var(--rust); border-radius:8px; padding:12px 14px; margin-top:8px; font-size:13px; color:#e2b499;}
+  .phone{font-family:'JetBrains Mono'; color:var(--amber); font-weight:700;}
+
+  /* ===== CHECKLIST ===== */
+  .checklist-group{margin-bottom:22px;}
+  .checklist-group h3{font-family:'Oswald'; font-size:15px; color:var(--text-dim); margin-bottom:8px; letter-spacing:0.04em;}
+  .check-item{
+    display:flex; align-items:flex-start; gap:10px; padding:9px 4px; border-bottom:1px solid var(--line);
+    cursor:pointer; font-size:14px;
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-box{
+    flex-shrink:0; width:18px; height:18px; border:2px solid var(--text-dimmer); border-radius:4px;
+    margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all .15s;
+  }
+  .check-item.done .check-box{background:var(--sage); border-color:var(--sage);}
+  .check-box svg{width:12px; height:12px; opacity:0; transition:opacity .1s;}
+  .check-item.done .check-box svg{opacity:1;}
+  .check-item.done .check-label{color:var(--text-dimmer); text-decoration:line-through;}
+  .check-label{color:var(--text-dim);}
+
+  .save-status{font-size:11px; color:var(--text-dimmer); font-family:'JetBrains Mono'; margin-top:10px; min-height:14px;}
+
+  /* ===== DOCUMENTS ===== */
+  .doc-card{background:var(--bg-panel); border-radius:10px; margin-bottom:10px; overflow:hidden;}
+  .doc-head{display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer;}
+  .doc-head-left{display:flex; align-items:center; gap:10px;}
+  .doc-lang{font-family:'JetBrains Mono'; font-size:10px; padding:2px 7px; border-radius:4px; background:var(--bg-raised2); color:var(--text-dim); text-transform:uppercase;}
+  .doc-title{font-family:'Oswald'; font-size:15px; color:var(--text);}
+  .doc-meta{font-size:11px; color:var(--text-dimmer); font-family:'JetBrains Mono';}
+  .doc-chevron{color:var(--text-dimmer); transition:transform .2s;}
+  .doc-card.open .doc-chevron{transform:rotate(180deg);}
+  .doc-body{display:none; padding:0 16px 16px; font-size:13.5px; color:var(--text-dim); line-height:1.7; border-top:1px solid var(--line);}
+  .doc-card.open .doc-body{display:block; padding-top:12px;}
+  .doc-body h4{font-family:'Oswald'; font-size:13px; color:var(--amber); margin:14px 0 4px; text-transform:none; letter-spacing:0;}
+  .doc-body h4:first-child{margin-top:0;}
+  .doc-body ul{margin:4px 0; padding-left:18px;}
+  .doc-body b{color:var(--text);}
+  .doc-note{background:rgba(232,169,75,0.08); border:1px solid var(--amber-dim); border-radius:6px; padding:8px 10px; font-size:12px; color:var(--text-dim); margin-bottom:14px;}
+  .doc-full-toggle{
+    display:inline-block; margin-top:10px; font-family:'JetBrains Mono'; font-size:12px; text-transform:uppercase;
+    letter-spacing:0.04em; color:var(--amber); background:var(--bg-raised2); border:1px solid var(--amber-dim);
+    padding:7px 14px; border-radius:6px; cursor:pointer;
+  }
+  .doc-full-text{display:none; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); font-size:13px; line-height:1.75;}
+  .doc-full-text.open{display:block;}
+  .doc-full-text h4{color:var(--amber); font-family:'Oswald'; font-size:13px; margin:16px 0 4px; text-transform:none;}
+  .doc-full-text h5{color:var(--text); font-family:'Inter'; font-weight:600; font-size:13px; margin:10px 0 2px;}
+  .doc-full-text p{margin:4px 0 10px;}
+  .doc-full-text ul,.doc-full-text ol{margin:4px 0 10px; padding-left:20px;}
+  .doc-full-text b{color:var(--text);}
+
+  /* ===== BOOKING DETAIL EXPANDED ===== */
+  .card{cursor:pointer;}
+  .card-full{display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-dim); line-height:1.7;}
+  .card.open .card-full{display:block;}
+  .card-full b{color:var(--text);}
+  .card-full .warn-line{color:#e2895e;}
+  .expand-hint{font-family:'JetBrains Mono'; font-size:10px; color:var(--text-dimmer); margin-top:6px;}
+
+  footer{max-width:920px; margin:0 auto; padding:0 20px 40px; color:var(--text-dimmer); font-size:12px; text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="eyebrow">Voucher KYK544644/1 · El Monte RV · Class C FS (30–32 ft)</div>
+    <h1 class="title">LA → Miami</h1>
+    <div class="subtitle">Малащенко · 4 чел. · 26 июля — 17 августа 2026 · 21 день · ~5 700 км</div>
+    <div class="odometer">
+      <div class="odo-num" id="dayNum">–</div>
+      <div style="flex:1">
+        <div class="odo-track"><div class="odo-fill" id="odoFill" style="width:0%"></div></div>
+        <div class="odo-labels"><span>LAX 26.07</span><span id="odoStatus">…</span><span>MIA 17.08</span></div>
+      </div>
+      <div class="odo-side" id="odoSide">—</div>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <button data-view="route" class="active">Маршрут</button>
+  <button data-view="bookings">Брони</button>
+  <button data-view="fuel">Заправки</button>
+  <button data-view="contacts">Контакты</button>
+  <button data-view="documents">Документы</button>
+  <button data-view="reference">Справочник</button>
+  <button data-view="checklist">Чек-лист</button>
+</nav>
+
+<main>
+
+  <!-- ================= ROUTE ================= -->
+  <div class="view active" id="view-route">
+    <section class="block">
+      <h2 class="section-title">Подневный план</h2>
+      <div id="days"></div>
+    </section>
+  </div>
+
+  <!-- ================= BOOKINGS ================= -->
+  <div class="view" id="view-bookings">
+    <section class="block">
+      <h2 class="section-title">✅ Подтверждено</h2>
+      <div class="booking-grid" id="bookings-ok"></div>
+    </section>
+    <section class="block">
+      <h2 class="section-title">🟡 Требует бронирования</h2>
+      <div class="booking-grid" id="bookings-todo"></div>
+    </section>
+  </div>
+
+  <!-- ================= FUEL ================= -->
+  <div class="view" id="view-fuel">
+    <section class="block">
+      <h2 class="section-title">⛽ Правило</h2>
+      <div class="ref-card"><p>Безопасный запас хода с 25% резервом: <b>465–597 км (289–371 миля)</b> на полном баке (208л/55 галлонов). Заправляться заранее, при первой удобной возможности после ~350–400 км — не ждать индикатор Low Fuel.</p></div>
+    </section>
+    <section class="block">
+      <h2 class="section-title">Карта заправок по маршруту</h2>
+      <div id="fuel-stops"></div>
+    </section>
+  </div>
+
+  <!-- ================= CONTACTS ================= -->
+  <div class="view" id="view-contacts">
+    <section class="block">
+      <h2 class="section-title">📞 Все контакты на маршруте</h2>
+      <div id="contacts-list"></div>
+    </section>
+  </div>
+
+  <!-- ================= DOCUMENTS ================= -->
+  <div class="view" id="view-documents">
+    <section class="block">
+      <h2 class="section-title">Официальные документы — оригинал + перевод на русский</h2>
+      <div class="doc-note">Ниже — сжатый перевод ключевых пунктов каждого документа (не дословный юридический перевод целиком). Оригиналы (PDF/DOCX на польском и английском) хранятся в переписке с USAkamperem.pl — при споре или неясности всегда в приоритете оригинал.</div>
+      <div id="documents"></div>
+    </section>
+  </div>
+
+  <!-- ================= REFERENCE ================= -->
+  <div class="view" id="view-reference">
+    <section class="block" id="reference-content"></section>
+  </div>
+
+  <!-- ================= CHECKLIST ================= -->
+  <div class="view" id="view-checklist">
+    <section class="block" id="checklist-content"></section>
+    <div class="save-status" id="saveStatus"></div>
+  </div>
+
+</main>
+
+<footer>Личный трип-компаньон · данные сверены с ваучером, счётом и подневным планом на 13.07.2026</footer>
+
+<script>
+/* ============ DATA ============ */
+
+const TRIP_START = new Date('2026-07-26T00:00:00');
+const TRIP_END   = new Date('2026-08-17T00:00:00');
+
+const days = [
+  {n:'0', date:'26–27.07 вс–пн', title:'Лос-Анджелес — приёмка кэмпера', tag:'booked',
+   summary:'Получение кэмпера в El Monte 15:00–15:30, закупка снаряжения в Walmart, ночёвка в ЛА.',
+   detail:`<b>15:00–15:30</b> — <b>Pick Up Time (подтверждено)</b>. El Monte RV LA: <span class="addr">12818 Firestone Blvd, Santa Fe Springs, CA 90670 · +1 (562) 404-9300</span>
+   <br><b>16:00</b> — закупка в Walmart Supercenter: <span class="addr">13310 Telegraph Rd, Santa Fe Springs, CA 90670</span> (химия для чёрного бака, туалетная бумага для RV, посуда, постельное, вода).
+   <br><br><b>Оплата на месте:</b> $1 736.04 (депозит $1500 + налоги), строго кредитная карта на имя главного водителя.
+   <br>✅ Уже включено в пакет (доплачивать не нужно): Unlimited Mileage, Generator Unlimited, Kitchen Kit, Awning, Peace of Mind, Additional Driver, 4× кемпинговых кресла.
+   <br>❌ Сознательно не подключали: Unlimited Tolls (маршрут в объезд платных дорог), GPS Device (навигация через телефон), Towing Fee (ничего не буксируем).
+   <br><b>Документы:</b> физические права всех водителей + МВУ (кроме Ярослава — амер. права CA) + загранпаспорта.
+   <br>📹 Инструктаж по кэмперу: <a href="https://vimeo.com/1091021666?fl=pl&fe=cm" target="_blank">vimeo.com/1091021666</a>`},
+
+  {n:'1–2', date:'28–29.07 вт–ср', title:'ЛА → пустыня Мохаве → Лас-Вегас', tag:'booked',
+   summary:'450 км. Остановка в Calico Ghost Town. Заправка в Jean, NV. Заселение в Wynn Las Vegas.',
+   detail:`<b>09:00–11:30</b> — выезд через Барстоу к Calico Ghost Town: <span class="addr">36600 Ghost Town Rd, Yermo, CA 92398</span>.
+   <br><b>11:30–13:30</b> — <i>(по желанию)</i> осмотр города-призрака 1881 года + обед. Огромная парковка под RV/автобусы. Время работы 9:00–17:00, $8/чел. ⚠️ Жара +43–45°C на солнце — плохо переносящим зной остаться в кэмпере под кондиционером, идущим — зонты и ледяная вода.
+   <br><b>13:30–16:30</b> — переезд через пустыню Мохаве (~280 км).
+   <br><b>16:30–16:45</b> — ⛽ <b>Заправка перед въездом в город</b>: <span class="addr">Pilot Travel Center, 115 W Primm Blvd, Jean, NV 89019</span> — прямо на I-15, крупный travel center под RV, без нужды маневрировать в городском трафике. Полный бак.
+   <br><b>16:45–18:30</b> — финальный перегон, заселение <b>Wynn Las Vegas</b>: <span class="addr">3131 Las Vegas Blvd S, Las Vegas, NV 89109</span>
+   <br>2 номера (Two Queens + King, Sphere View) <span class="mono">#4SZ73EZ7K / #4SZ73EZ7P</span> — доплата на месте <b>$1 250.68</b>. Resort fee $55+налог/ночь отдельно. Заезд с 15:00, выезд до 11:00.
+   <br><b>18:30+</b> — вечерняя прогулка по Вегасу.
+   <div class="warn-box">💡 На затяжных подъёмах I-15 в жару — выключить кондиционер в кабине, если стрелка температуры двигателя растёт, и включить салонный кондиционер через генератор вместо него.</div>`},
+
+  {n:'2', date:'29.07 ср', title:'Лас-Вегас — The Sphere', tag:'booked',
+   summary:'Свободная программа днём, вечером шоу в Сфере 17:00–19:00.',
+   detail:`<b>17:00–19:00</b> — шоу <b>The Sphere</b>: <span class="addr">255 Sands Ave, Las Vegas, NV 89169</span> (вход со стороны Venetian).
+   <br><span class="tag booked">4 билета оплачены $636</span> — билеты в приложении Ticketmaster (нужен вход в аккаунт).`},
+
+  {n:'3', date:'30.07 чт', title:'Вегас → Нацпарк Zion', tag:'booked',
+   summary:'260 км. Приватный e-bike тур на закате с Ride Zion Adventures.',
+   detail:`<b>09:00–10:45</b> — выезд по I-15 North (~130 км до границы штата).
+   <br><b>10:45</b> — финальная заправка: <b>Mesquite, NV</b> — полный бак (Regular Unleaded), в Юте бензин дороже.
+   <br><b>11:00–13:30</b> — переезд через Virgin River Gorge (Аризона) до кемпинга. ⚠️ Узкое ущелье, порывы ветра — руль двумя руками. На этом отрезке — смена часового пояса +1 час (Невада тихоокеанское → Юта горное).
+   <br><b>13:30–14:30</b> — заезд в кемпинг. <b>Zion River Resort RV Park</b> <span class="tag booked">оплачено $107.49</span>: <span class="addr">551 UT-9, Virgin, UT 84779</span>. Официальный check-in с 12:00 — приезжаете без спешки. <span style="color:#e2895e">⚠️ адрес оплаты должен совпадать с адресом на карте.</span>
+   <br><b>14:30–16:30</b> — свободное окно (~2ч), отдых у бассейна кемпинга, обед.
+   <br>✅ America the Beautiful Pass уже куплен онлайн заранее — заезжать за ним не нужно. <b>Ярославу иметь права при себе.</b>
+   <br><b>16:30</b> — <b>Ride Zion Adventures</b> забирает всей группой прямо от кемпинга (Sprinter/Jeep Rubicon 4xe). Бронь <span class="mono">#DAXPYS</span>, 4 гостя. Депозит $597.50 оплачен, остаток $597.50 списался автоматически 29.07 вечером. Отмена: полный возврат за 72+ч, позже — 50% депозита.
+   <br><b>16:55–17:10</b> — прибытие в Спрингдейл, подбор e-bike и шлемов, инструктаж.
+   <br><b>17:10–~20:00</b> — <b>Private Sunset E-Bike Tour</b> (3–4ч): Pa'rus Trail и Zion Canyon Scenic Drive, остановки Court of the Patriarchs, Zion Lodge, The Grotto, Angel's Landing, Big Bend. В туре: trail dinner, вода, снеки, электролиты LMNT.
+   <br><b>20:30+</b> — возврат в кемпинг, свободный вечер.`},
+
+  {n:'4', date:'31.07 пт', title:'Zion → Bryce Canyon', tag:'booked',
+   summary:'220 км (объезд тоннеля). Хайкинг на выбор, ковбойский ужин-шоу.',
+   detail:`<b>09:00–12:00</b> — переезд на высоту 2500м, в объезд закрытого тоннеля: Springdale → Kanab → US-89.
+   <br><b>12:00–13:00</b> — ⛽ заправка по пути.
+   <br><b>13:00–14:00</b> — заселение. <b>Ruby's Inn RV Park</b> <span class="tag booked">оплачено $98.95</span>: <span class="addr">300 S Main St, Bryce Canyon City, UT 84764</span>, место <span class="mono">PFHU 103</span>, код <span class="mono">Q3Z9N6</span>. Official check-in с 12:00. $10 сбор всегда; отмена <48ч — депозит не возвращается.
+   <br><b>14:00–14:30</b> — посадка на бесплатный Bryce Canyon Shuttle (у кемпинга каждые 15 мин). ⚠️ Предъявить America the Beautiful Pass.
+   <br><b>14:30–17:30</b> — хайкинг, маршрут на выбор на месте (см. Справочник — 4 варианта троп). ⚠️ Муссонный сезон — следить за небом, при грозе уходить с открытого края вниз.
+   <br><b>17:30–18:00</b> — возврат на шаттле. Последний рейс 18:19.
+   <br><b>18:00–19:15</b> — свободное время, сборы к ужину.
+   <br><b>19:15–19:30</b> — пешком до <b>Ebenezer's Barn & Grill</b>: <span class="addr">110 E Ctr St, Bryce Canyon City, UT 84764</span>
+   <br><b>19:30–22:00</b> — ковбойский ужин и шоу "Timeless" <span class="tag booked">оплачено $234</span>, ID <span class="mono">TGNQ904</span>. Меню: 2 стейка, 1 BBQ Plate, 1 курица.
+   <br><b>22:30+</b> — возврат в кемпинг.`},
+
+  {n:'5', date:'01.08 сб', title:'Bryce → Пейдж — Каньон Антилопы, Horseshoe Bend, озеро Пауэлл', tag:'booked',
+   summary:'275 км. Приватный combo-тур (Antelope Canyon + Horseshoe Bend), закатный дайнинг-круиз на Lake Powell.',
+   detail:`<b>09:00–11:15/11:30</b> — выезд, переезд до Пейджа (реальное время в пути 3ч15–30м, включая выигранный час на смене пояса).
+   <br>⛽🍕 <b>11:15/11:30–12:00</b> — заправка полного бака + перекус: <span class="addr">Maverik, 701 Tunnel Rd, Page, AZ 86040</span> (круглосуточно, пицца, магазин).
+   <br><b>12:00–12:15</b> — переезд к месту встречи (~4.5 км южнее города, у поворота на Horseshoe Bend Overlook).
+   <br><b>12:15–12:40</b> — буфер + check-in (за 20 мин до тура). ✅ Парковка кэмпера проверена по спутнику/Street View — открытая большая площадка.
+   <br><b>13:00–16:00</b> — <b>Combo: Secret Antelope Canyon & Horseshoe Bend Overlook</b> (3 часа). Бронь <span class="mono">#364875260</span>. Оплачено <b>$1 478.80</b>. Приватная группа (1 Private Group). Horseshoe Bend включён — отдельно ехать не нужно.
+   <br><b>16:00–16:20</b> — переезд в кемпинг. <b>Wahweap RV & Campground</b> <span class="tag booked">оплачено $102.29</span>: <span class="addr">Lakeshore Dr, Page, AZ 86040</span>, рез. <span class="mono">80006E5UY / 86H2D1</span> на имя Дарьи.
+   <br><b>16:20–17:30</b> — заселение, душ, отдых.
+   <br><b>17:30–17:50</b> — пешком/на кэмпере к месту посадки на круиз: <span class="addr">Lake Powell Resort, 100 Lakeshore Dr, Page, AZ 86040</span>.
+   <br><b>17:50–18:00</b> — регистрация на круиз (за 30 мин). Бронь <span class="mono">#364576151</span>, оплачено <b>$586.84</b>.
+   <br><b>18:00–20:00</b> — 🛥️ <b>Canyon Princess Dinner Cruise</b> — закатный ужин на воде.
+   <br><b>20:00</b> — возврат в кемпинг.`},
+
+  {n:'6', date:'02.08 вс', title:'Пейдж → Гранд-Каньон, South Rim', tag:'booked',
+   summary:'180 км. Desert View Drive, закат на видовых точках South Rim.',
+   detail:`<b>09:00</b> — выезд из Wahweap.
+   <div class="doc-note">💡 Horseshoe Bend теперь включён в тур Дня 5 — утренняя остановка здесь опциональна (бонус, если хочется увидеть ещё раз/в другом свете), можно пропустить и выехать сразу к Grand Canyon, сэкономив ~1.5 часа. Решение не зафиксировано.</div>
+   <br><i>Опционально:</i> <b>09:00–09:15</b> — переезд до Horseshoe Bend: <span class="addr">Mile Marker 545, Highway 89, Page, AZ 86040</span>, <b>09:15–10:15</b> — осмотр (тропа 0.6 мили).
+   <br><b>~09:00/10:15–12:45</b> — переезд к East Entrance Гранд-Каньона (2.5ч, честный расчёт).
+   <br><b>12:45–13:30</b> — остановка у <b>Desert View Watchtower</b> — парковка под RV до 40 футов, без проблем. ⛽ Заправка полного бака здесь же — готовит к длинному Дню 7 (~660 км, Albuquerque).
+   <br><b>13:30–15:30</b> — продолжение по Desert View Drive до Village, по желанию остановки: No Name Point (подтверждена RV-парковка), Moran Point, Grandview Point, Duck on a Rock, Pipe Creek Vista.
+   <br><b>15:30–16:30</b> — заезд в кемпинг. <b>Trailer Village RV Park</b> <span class="tag booked">оплачено $82.51</span>, рез. <span class="mono">#63275SG351767</span>: <span class="addr">100 Market Plaza Rd, Grand Canyon Village, AZ 86023</span>. На территории — магазин и кафе-ресторан.
+   <br><b>16:30–19:30</b> — 🌅 свободный видовой блок (гибко, на ваше усмотрение): Yavapai Geology Museum (парковка ограничена 22 футами — только шаттлом/пешком), Mather Point (рейтинг 4.9, 5 мин пешком от Visitor Center), Yaki Point (только шаттл/пешком, закрыт для частного транспорта). Blue Route от Trailer Village → Visitor Center → пересадка на Orange Route. Шаттлы каждые ~15 мин, либо такси Xanterra 928-638-2631.
+   <br><b>19:30–21:00</b> — 🍽️ ужин <b>Yavapai Tavern</b> (при кемпинге, работает до 21:00).
+   <div class="warn-box">💡 Высота 2100м — вечером свежо, взять ветровки. America the Beautiful Pass покрывает въезд за весь кэмпер и проезды шаттлом.</div>`},
+
+  {n:'7', date:'03.08 пн', title:'Гранд-Каньон → Albuquerque: горный трамвай на закате', tag:'booked',
+   summary:'~660 км. Заправка+обед в Gallup, заселение в Albuquerque, вечером — хот-таб на месте или Sandia Peak Tramway.',
+   detail:`<b>09:00 – 12:45</b> — Выезд из Trailer Village RV Park (Grand Canyon). Первая половина пути (~270 км) через плато Аризоны в сторону границы Нью-Мексико.
+   <br>⚠️ При пересечении границы AZ→NM — смена часового пояса <b>+1 час</b> (Аризона не переходит на летнее время, Нью-Мексико — переходит).
+
+   <br><br>⛽ <b>12:45 – 13:30</b> — Заправка + обед в Gallup, NM.
+   <br>Адрес: <span class="addr">3380 W Historic Hwy 66, Gallup, NM 87301</span>
+   <br>Круглосуточно, RV-заправка и парковка, есть кафе/ресторан.
+
+   <br><br><b>13:30 – 17:15</b> — Вторая половина пути (~390 км) до Albuquerque.
+
+   <br><br><b>17:15</b> — Заселение в кемпинг <b>Albuquerque KOA Journey</b>.
+   <br>Адрес: <span class="addr">12400 Skyline Rd NE, Albuquerque, NM 87123</span>
+   <br>Confirmation: <span class="mono">22528253</span>. Pull-Thru, 50/30/20 Amps, Full Hookups, KOA Patio® — подтверждено под Motorhome 32 фута со слайдами.
+   <br>Оплачено: $165.03, с брёвнами, розжигом, чистой водой.
+   <br>На территории: бассейн, крытый хот-таб, сауна, мини-гольф, прокат велосипедов.
+
+   <br><br><b>Вечером на выбор:</b>
+   <br>🛁 Отдых в хот-табе/сауне на месте — никуда ехать не нужно.
+   <br>🚡 <b>Sandia Peak Tramway</b> на закате — подъём на 10 378 футов, вид на 11 000 кв. миль пустыни, наверху заметно холоднее — куртки обязательно. Работает 9:00–20:00, выехать в 18:00 на такси Uber/Lyft.
+   <br>Адрес: <span class="addr">30 Tramway Rd NE, Albuquerque, NM 87122</span>
+   <br>Наверху ресторан <b>TEN 3</b> — Casual Dining без брони, но если хотите Fine Dining (более полный ужин), туда бронь обязательна заранее.
+   <br>Билеты на подъёмник нужно купить заранее — напомню за несколько дней, на понедельник ажиотаж не планируется. Дайте знать, пожалуйста, если не хотите ехать.
+   <br>💡 На месте: отправление трамвая объявляют по громкой связи за ~10 минут — не нужно стоять точно у дверей, можно спокойно погулять рядом с зоной посадки.`},
+
+  {n:'8', date:'04.08 вт', title:'Albuquerque → Амарилло: стейк-челлендж', tag:'booked',
+   summary:'~465 км (проверено). Заправка с крюком в начале дня, ретро-ланч в Тукумкари, ужин-челлендж в The Big Texan (бронь подтверждена).',
+   detail:`<b>09:00 – 09:20</b> — выезд из Albuquerque KOA Journey, крюк (~10-15 мин, в сторону, противоположную Амарилло) к заправке.
+   <br>⛽ <b>09:20 – 09:35</b> — заправка полного бака: <b>TA Albuquerque</b>, <span class="addr">2501 University Blvd NE, Albuquerque, NM 87107</span>. Круглосуточно, 150 мест под грузовой/крупный транспорт, 8 дизельных полос + бензин, официально подтверждено "RV Gasoline, RV Parking".
+   <br><b>09:35 – ~12:05</b> — переезд до Тукумкари (~282 км, ~2ч30м).
+   <br><b>12:05 – 13:05</b> — 🍔 Ретро-ланч в стиле 50-х годов: <b>SideKix on 66</b>, <span class="addr">321 E Rte 66 Blvd, Tucumcari, NM 88401</span> (рейтинг 4.6, классический дайнер, домашняя кухня с зелёным чили).
+   <br><b>13:05 – ~15:50</b> — финальный отрезок до Амарилло (~185 км, ~1ч45м).
+   <br>⚠️ При пересечении границы Техаса — смена часового пояса <b>+1 час</b> (Нью-Мексико → Техас). По часам прибытие ~15:50.
+   <br><b>~15:50 – 16:20</b> — заселение. <b>The Big Texan RV Ranch</b> <span class="tag booked">оплачено $79.00</span>, рез. <span class="mono">12498999</span>: <span class="addr">1414 Sunrise Dr, Amarillo, TX 79104</span>. Место сквозное (Pull-Thru) — сдавать назад не нужно. Заезд/выезд офиса кемпинга: 8:00–18:00.
+
+   <br><br><b>16:20 – 17:30</b> — свободное время (~70 мин): бассейн кемпинга (глубина до 9 футов), душ, отдых после переезда.
+
+   <br><b>17:30 – 17:45</b> — сборы, ожидание фирменного лимузина с бычьими рогами на капоте (бесплатно, часть сервиса ресторана) — забирает прямо от места стоянки.
+
+   <br><b>~17:45 – 18:00</b> — переезд на лимузине до ресторана (~1.6 км, ~5-10 мин).
+
+   <br><b>18:00 – ~20:00</b> — 🥩 <b>Ужин в The Big Texan Steak Ranch</b>: <span class="addr">7701 I-40, Amarillo, TX 79118</span>.
+   <br>✅ Бронь подтверждена через OpenTable: confirmation <span class="mono">#539128</span>, вторник 04.08, 18:00, на 4 человека (host — Ярослав). Special request про лимузин отправлен.
+   <br>⚠️ <b>Grace period 15 минут</b> — при опоздании более чем на 15 мин после 18:00 обязательно позвонить: <span class="phone">(806) 372-6000</span>.
+   <br>Фирменное блюдо — стейк 72 унции бесплатно, если съедите за час (+ гарнир, креветочный коктейль, печёный картофель, салат — тоже за час).
+
+   <br><b>~20:00 – 20:15</b> — обратный лимузин в кемпинг (окно работы лимузина — 16:00–21:00, вы укладываетесь с запасом).
+   <br>🚕 <b>Запасной вариант</b>, если задержитесь позже 21:00: Uber, ориентировочно $7-10 в одну сторону (короткая дистанция упирается в минимальный тариф) — лучше забронировать заранее через приложение (OpenTable даёt прямую ссылку "Reserve a ride with Uber"), а не ловить в моменте — Uber в Амарилло работает, но с более долгим ожиданием, чем в крупных городах.
+
+   <br><b>20:15+</b> — свободный вечер в кемпинге, отдых перед завтрашним переездом.`},
+
+  {n:'9–10', date:'05–06.08 ср–чт', title:'Амарилло → Даллас: радиальный отдых класса люкс на озере', tag:'booked',
+   summary:'~547 км. Заправка в Amarillo, вторая заправка+магазин в Wichita Falls. 2 ночи на озере Grapevine + день отдыха в Fort Worth Stockyards.',
+   detail:`<b>09:00 – 10:00</b> <i>(по желанию)</i> — <b>Cadillac Ranch</b>. Культовая инсталляция: 10 Кадиллаков, воткнутых носом в землю под тем же углом, что у пирамид в Гизе, разрисованных десятками тысяч путешественников до вас. Баллончик — на месте у вендора (~$8, не гарантирован) либо взять заранее. Парковка — грунтовая площадка у въезда, места хватает под RV/трейлеры, 5 минут пешком до машин.
+   <br>📍 <span class="addr">13651 I-40 Frontage Rd, Amarillo, TX 79124</span>
+
+   <br><br>⛽ <b>10:00 – 10:30</b> — заправка полного бака. <b>TA Amarillo</b>: <span class="addr">7000 E. Interstate 40, Amarillo, TX 79118</span>. Круглосуточно, 185 мест под крупный транспорт, на территории Black Bear Diner (6:00–22:00).
+
+   <br><br><b>10:30 – 14:00</b> — переезд до Wichita Falls (~362 км, ~3.5ч).
+   <br>⚠️ Навигатор держим в режиме "Avoid tolls" — в объезд платной зоны NTTA у Далласа, через бесплатные дублёры I-35W/I-20.
+
+   <br><br>⛽🛒 <b>14:00 – 15:30</b> — заправка + закупка продуктов (1.5ч, без спешки). <b>Walmart Supercenter</b>: <span class="addr">2700 Central Freeway, Wichita Falls, TX 76305</span>. Круглосуточно, заправка и полноценный продуктовый в одном месте.
+
+   <br><br><b>15:30 – 17:30</b> — финальный отрезок до Grapevine (~185 км, ~2ч).
+
+   <br><br><b>17:30 – 18:00</b> — заезд в кемпинг. <b>The Vineyards Campground</b> <span class="tag booked">оплачено $183.34</span>: <span class="addr">1501 N Dooley St, Grapevine, TX 76051</span>. Регулярно входит в топ-5 лучших RV-резортов США, на берегу озера Grapevine.
+   <br>✅ Забронировано: <b>Gold Premium Pull-Thru Site</b> с личным деревянным пирсом в озеро, патио-зоной и плетёной мебелью. Подтверждение <span class="mono">#I00000089430</span> (карта Ярослава).
+   <br><b>Отмена:</b> &lt;14 дней = штраф в размере 1 ночи. Ранний выезд — без возврата.
+   <br>🟡 Резерв, если мест не окажется: Dallas/Arlington KOA Holiday, <span class="addr">2715 S Cooper St, Arlington, TX 76015</span>.
+
+   <br><br><b>18:00+</b> — полный стоп на две ночи. Купание на пляже, аренда каяков/паддлбордов, вечер у своего костра (дрова — из автомата в кемпинге).
+
+   <br><br><b>06.08 — день отдыха (доезд на Uber):</b>
+   <br><b>11:00</b> — прибытие к перегону лонгхорнов. <b>Fort Worth Stockyards</b> <span class="tag pending">не забронировано, без брони не нужна</span>: <span class="addr">131 E Exchange Ave, Fort Worth, TX 76164</span>. Историческая улица скотоводов — дважды в день (11:30 и 16:00) настоящие ковбои перегоняют стадо техасских лонгхорнов, единственный такой аттракцион в мире.
+   <br>Обед — 🥩 брискет в <b>Riscky's Bar-B-Q</b>.
+   <br>По желанию: 🚂 Grapevine Vintage Railroad (поезд до Stockyards, альтернатива кэмперу); 🎨 Bishop Arts District (Даллас, ~40 мин) — арт-квартал, галереи, бутики; 🏛️ The Sixth Floor Museum + Dealey Plaza — музей об убийстве Кеннеди + West End, парк в историческом районе; 👁️ Reunion Tower — смотровая башня 561 фут, панорама 360°; 🏞️ Lake Grapevine прямо у кемпинга — без выезда никуда.`},
+
+  {n:'11–12', date:'07–08.08 пт–сб', title:'Даллас → Новый Орлеан', tag:'pending',
+   summary:'790 км. Swamp tour, джаз в Preservation Hall.',
+   detail:`<b>08:30–19:30</b> — длинный переезд, объезд платных дорог NTTA через I-35W/I-20.
+   <br>Кемпинг: <b>French Quarter RV Resort</b> <span class="tag booked">забронировано #Z8LFYGY8LS</span>: <span class="addr">500 N Claiborne Ave, New Orleans, LA 70112</span> — FHU-BI Premium, $343.50 оплачено.
+   <br><b>Заезд/выезд:</b> строго 12:00–11:00, опоздание = ещё одна ночь. Отмена по тел. 504-586-3000. Мусор — самостоятельно (штраф $100).
+   <br><b>08.08 —</b> Private Airboat Tour <span class="tag pending">не забронировано</span>, Preservation Hall Big Shot VIP <span class="tag pending">не забронировано</span>
+   <div class="warn-box">Пешком до Французского квартала — только под мостом I-10, не задерживаясь. Вечером — строго на Uber.</div>`},
+
+  {n:'13', date:'09–10.08 вс–пн', title:'Новый Орлеан → Дестин (Флорида)', tag:'booked',
+   summary:'420 км. Кемпинг прямо на пляже. Теряем 1 час на границе Флориды.',
+   detail:`Кемпинг: <b>Camp Gulf RV Park</b> <span class="tag booked">оплачено $213.29</span>: <span class="addr">10005 Emerald Coast Pkwy W, Miramar Beach, FL 32550</span>, Beach Site (2-я линия от воды).
+   <div class="warn-box">Флорида: слив серой воды на землю запрещён законом штата. Канализационный шланг — только с нарезным (screw-in) соединением. Мыть кэмпер на споте нельзя. Пройдите спот пешком перед заездом.</div>
+   Пляж: костры только в fire pits (штраф $50 за золу), алкоголь на улице только в упаковке, сушка вещей — только за кэмпером, тишина 22:00–08:00.`},
+
+  {n:'14', date:'10.08 пн', title:'Дестин → Майами — финишный рывок', tag:'risk',
+   summary:'1040 км за один день. Решили не разбивать — смотрим по самочувствию на месте.',
+   detail:`<b>06:30–19:30</b> — смена водителей каждые 2 часа, технические остановки max 15 мин.
+   <br>Флорида: едем по бесплатной I-95 параллельно Florida's Turnpike, чтобы не попасть под электронные толлы.
+   <div class="warn-box"><b>Решение принято:</b> день не разбиваем на два, оцениваем состояние в пути. Буфер — 6 дней в Майами до сдачи, при необходимости можно скорректировать по ходу.</div>`},
+
+  {n:'15–20', date:'11–16.08', title:'Майами — досуг и буфер', tag:'pending',
+   summary:'6 дней отдыха и запаса времени перед сдачей кэмпера.',
+   detail:`Резерв на случай задержек, усталости или желания задержаться где-то по пути. <b>Miami Everglades RV Resort</b> <span class="tag pending">забронировать срочно — 7 ночей подряд, высокий сезон</span>: <span class="addr">16201 SW 184th St, Miami, FL 33187</span>`},
+
+  {n:'21', date:'17.08 пн', title:'Сдача кэмпера — Майами', tag:'booked',
+   summary:'Drop Off Time (подтверждено): 10:30–11:00 утра. Услуга Drop & Go — уборку и слив баков делают за вас.',
+   detail:`El Monte RV Miami: <span class="addr">13700 SW 248th St, Princeton (Miami), FL 33032</span>
+   <br><b>10:30–11:00</b> — <b>Drop Off Time (подтверждено)</b>.
+   <br>✅ <b>Drop & Go куплено — $125.00</b>: базовая уборка (до 1 часа), слив баков, вывоз мусора (до 1 мешка) — делают сотрудники, вам заниматься этим не нужно.
+   <br>Всё равно нужно: полный бак бензина и пропана — не покрывается Drop & Go, недолив считается по двойному тарифу.
+   <br>Опоздание — штраф $50/час.`},
+];
+
+const bookingsOk = [
+  {title:'Wynn Las Vegas', date:'28–30.07',
+   detail:'2 номера с видом на Сферу. Доплата на месте: <b>$1 250.68</b>.',
+   full:`<b>Адрес:</b> <span class="addr">3131 Las Vegas Blvd S, Las Vegas, NV 89109</span>
+   <br><br><b>Номер 1:</b> Wynn Panoramic Two Queens – Sphere View Upgrade
+   <br>Confirmation: <span class="mono">4SZ73EZ7K / 32815606</span>
+   <br>Всего: $854.98 · Оплачено: $221.09 · К оплате на месте: <b>$633.89</b>
+   <br><br><b>Номер 2:</b> Wynn Panoramic King – Sphere View Upgrade
+   <br>Confirmation: <span class="mono">4SZ73EZ7P / 32815607</span>
+   <br>Всего: $798.20 · Оплачено: $181.41 · К оплате на месте: <b>$616.79</b>
+   <br><br><b>Итого к оплате на месте: $1 250.68</b>
+   <br>Resort fee $55+налог/ночь — отдельно, не включён. Заезд с 15:00, выезд до 11:00. Отмена без штрафа за 72ч до заезда.`},
+
+  {title:'The Sphere — 4 билета', date:'29.07, 17:00',
+   detail:'$636 оплачено. Электронно через Ticketmaster.',
+   full:`<span class="addr">255 Sands Ave, Las Vegas, NV 89169</span> (вход со стороны Venetian). Билеты электронные — нужно приложение Ticketmaster и вход в аккаунт, на котором куплено.`},
+
+  {title:'Zion River Resort RV Park', date:'30–31.07',
+   detail:'Оплачено $107.49. Premium Pull Through, место 7, у бассейна.',
+   full:`<span class="addr">551 E State Route 9, Virgin, UT 84779</span> (15 мин до парка Zion)
+   <br>Confirmation Code: <span class="mono">97807121</span>
+   <br><b>Место:</b> №7, Premium Pull Through (макс. длина сайта 65 футов) — заезд насквозь, сдавать назад не нужно. Премиум-места шире стандартных, идеально ровное покрытие, в самой удобной зоне кемпинга — 30 секунд пешком до бассейна/спа. Удалено от шумного въезда/офиса/трафика — тихо и безопасно.
+   <br><b>Лимит:</b> максимум 4 человека.
+   <br><b>Оплачено:</b> $107.49 (Visa ...0798) — полностью, доплат нет.
+   <div class="warn-line">⚠️ <b>GPS часто останавливает за 1-2 мили до места</b> — если навигатор ведёт на Sheep Bridge Rd, НЕ ехать туда, это грунтовка в плохом состоянии.</div>
+   <b>Заезд/выезд:</b> 12:00 → 11:00, опоздание с выездом >30 мин — доплата вплоть до ещё одной ночи.
+   <br><b>Отмена:</b> за 8 дней — штраф $10. Возврата за ранний выезд нет. <b>Смена места:</b> кемпинг может заменить участок на аналогичный при необходимости.
+   <br><b>При позднем приезде:</b> на доске у главного здания — пакет с вашим именем, номером места и картой.
+   <br><b>Wi-Fi:</b> "Zion River Resort", пароль <span class="mono">happycamper2023</span>. Код от туалетов/прачечной: <span class="mono">2468</span> (прачечная работает 24ч, нужна наличность на автомат размена).
+   <br><b>Тихие часы:</b> с 22:00. Пропан — заправка 8:00-15:00. Магазин/лобби — 7:00-23:00.
+   <br>Экстренный телефон (нерабочее время): <span class="phone">435-494-9289</span>. Общий: (435) 635-8594.
+   <br><b>Шаттл до Zion (не используем):</b> резорт предлагает свой шаттл $15+налог/чел, но требует записи накануне вечером и <b>не работает в день заезда/отъезда</b> — для Дня 3 (день заезда) не подошёл бы в любом случае, поэтому выбор Ride Zion Adventures был правильным.`},
+
+  {title:'Ruby\'s Inn RV Park', date:'31.07–01.08',
+   detail:'Оплачено $98.95. Место PFHU 103, 32 фута.',
+   full:`<span class="addr">300 S Main St, Bryce Canyon City, UT 84764</span>
+   <br>Код резервации: <span class="mono">Q3Z9N6</span>
+   <br>Место: <b>PFHU 75 ft (103)</b> — подтверждено под White Ford Class C 32ft, слайды с обеих сторон.
+   <br>Оплачено: $98.95 (Visa ...2265) — полностью, доплат нет.
+   <br><b>Отмена:</b> $10 сбор всегда. Возврат депозита при отмене за 48+ часов. No-show — списывается 1 ночь + налог, остаток брони отменяется.
+   <br><b>Заезд/выезд:</b> полдень → 11:00. Ранний выезд после заселения — $10.
+   <br>Activities Desk (экскурсии на месте): 435-834-8032. Общий: (435) 834-5301, rvpark@rubysinn.com.`},
+
+  {title:'Ride Zion Adventures — Sunset E-Bike Tour', date:'30.07, 16:30',
+   detail:'Оплачено полностью $1195. Приватный тур с гидом, пикап от кемпинга.',
+   full:`Бронь: <span class="mono">#DAXPYS</span>, 4 гостя.
+   <br>Депозит $597.50 оплачен при бронировании, остаток $597.50 списан автоматически 29.07 вечером — итого оплачено полностью $1195.00.
+   <br>Пикап: Zion River Resort (кемпинг), Mercedes Sprinter/Jeep Rubicon 4xe.
+   <br>В туре: приватный гид, e-bike премиум-класса, trail dinner, вода, снеки, электролиты LMNT.
+   <br>Отмена: полный возврат за 72+ч до тура, позже — возврат 50% депозита.`},
+
+  {title:'Ebenezer\'s Barn & Grill — шоу Timeless', date:'31.07, 19:30',
+   detail:'Оплачено $234. 2 стейка, BBQ plate, курица.',
+   full:`<span class="addr">110 E Ctr St, Bryce Canyon City, UT 84764</span>
+   <br>ID резервации: <span class="mono">TGNQ904</span>
+   <br>Оплачено: $234.00 (карта Приор)
+   <br>Включено в меню: 2 стейка из говядины, 1 BBQ Plate, 1 курица.`},
+
+  {title:'Wahweap RV & Campground', date:'01–02.08',
+   detail:'Оплачено $102.29. На имя Дарьи. Есть доплаты на месте.',
+   full:`<span class="addr">Lakeshore Dr, Page, AZ 86040</span>
+   <br>Itinerary number: <span class="mono">80006E5UY</span> (доп. код 86H2D1)
+   <br>На имя: <b>Darya Malashchenko</b>
+   <br>Full Hook-up RV site, 4 взрослых.
+   <br>Оплачено: $102.29 — <b>Amount Due: $0.00</b> (подтверждено официально, доплат по самой брони нет).
+   <br><br><b>Доплаты на месте (отдельно от брони):</b>
+   <ul>
+   <li>Курортный сбор: $14.99 + налог</li>
+   <li>Местные налоги/сборы: не указаны точно, обычно $2–4/ночь</li>
+   <li>Park Entrance Fee — <b>не платить</b>, покрыто America the Beautiful Pass</li>
+   </ul>
+   <br>Служба поддержки: 9:00-17:30 (время Аризоны), 602-278-8888.`},
+
+  {title:'Horseshoe Bend Tours — Combo Antelope Canyon + Horseshoe Bend', date:'01.08, 13:00–16:00',
+   detail:'Оплачено $1,478.80. Приватная группа, парковка проверена.',
+   full:`Место встречи: <span class="addr">36.870833, -111.501167</span> — южнее Page по трассе 89, у поворота на Horseshoe Bend Overlook.
+   <br>Бронь: <span class="mono">#364875260</span>. Оплачено: <b>$1,478.80</b> (в счёте было $1,438 + $40.80 — комиссия/сбор при списании, не расшифрована, можно уточнить).
+   <br>Формат: <b>1 Private Group</b> — только ваша семья. Horseshoe Bend включён в тур.
+   <br><br><b>Что входит:</b>
+   <ul>
+   <li>Индивидуальный транспорт — частный внедорожник от офиса прямо к началу тропы в каньон</li>
+   <li>Личный гид — прогулка 300м через каньон, приватный темп для фото (небольшая группа, не общий поток)</li>
+   <li>Эксклюзивный доступ — вдали от толп общественных туров</li>
+   <li>Horseshoe Bend Overlook — отдельно ехать не нужно</li>
+   </ul>
+   <br>Check-in — за 20 минут до тура (12:40).
+   <br>Отмена: полный возврат за 72+ч. Позже — без возврата, кроме отмены из-за угроз безопасности (паводок) — тогда полный возврат. Можно передать место другому человеку.
+   <br>✅ Все 4 участника подписали Release of Liability & Assumption of Risk Agreement (включая Ярослава).
+   <br>Что взять: головной убор, крем от солнца, вода, удобная обувь (до 1 мили по песчаному рельефу). Нельзя: дроны, алкоголь, стекло, оружие.
+   <br>Контакт: (435) 275-4594, info@horseshoebendtours.com`},
+
+  {title:'Canyon Princess Dinner Cruise', date:'01.08, 18:00',
+   detail:'Оплачено $586.84. Закатный ужин на воде, Wahweap Bay.',
+   full:`Сбор: <span class="addr">Lake Powell Resort, 100 Lakeshore Dr, Page, AZ 86040</span> — стойка Boat Tour Desk в лобби, за 30 минут до отправления.
+   <br>Бронь: <span class="mono">#364576151</span>. Оплачено: <b>$586.84</b>.
+   <br>Стол закреплён на ваше имя. Waiver подписан всеми четырьмя.
+   <br>Ужин включён: салаты, хлеб, горячее (2× говядина, 1× лосось, 1× курица), десерты. Алкоголь — платный премиум-бар отдельно.
+   <br>💡 QR-билеты — сохранить в Apple/Google Wallet или распечатать заранее.
+   <br><b>На борту:</b> только безналичная оплата (карты) — Lake Powell полностью отказался от наличных. Дресс-код отсутствует.
+   <br><b>Отмена:</b> полный возврат при отмене за <b>24+ часа</b>. Менее чем за сутки — сумма сгорает полностью.
+   <br>Контакт: (928) 645-1150, lpboattours@aramark.com.`},
+
+  {title:'Trailer Village RV Park (Grand Canyon)', date:'02–03.08',
+   detail:'Оплачено $82.51 (вкл. налог + donation). RV Site 29-50 футов.',
+   full:`<span class="addr">100 Market Plaza Rd, Grand Canyon Village, AZ 86023</span>
+   <br>Номер резервации: <span class="mono">63275SG351767</span>
+   <br>Тип: <b>RV Site 29-50 Feet</b> — категория, не конкретный номер участка (присваивается на месте).
+   <br>Базовая стоимость: $76.25 + налог + добровольное пожертвование $1 в Grand Canyon National Park Trust (можно отказаться на месте).
+   <br>Оплачено: $82.51 — полностью.
+   <br><b>Заезд/выезд:</b> оба в <b>12:00</b> (не 11:00, как у других кемпингов на маршруте — обратите внимание, тут по-другому!).
+   <br><b>Regisration Kiosk</b> работает 10:00-20:00 — если закрыт, идти на Front Desk отеля Yavapai Lodge.
+   <br><b>Отмена:</b> за 48+ часов до 12:00 в день заезда — иначе депозит сгорает.
+   <br>Общий телефон: 877-404-4621.`},
+
+  {title:'Albuquerque KOA Journey', date:'03–04.08',
+   detail:'Оплачено $165.03. Pull-Thru, 50/30/20 Amps, Full Hookups.',
+   full:`<span class="addr">12400 Skyline Road NE, Albuquerque, NM 87123</span>
+   <br>Confirmation #: <span class="mono">22528253</span>
+   <br>Место: <b>Pull-Thru, 50/30/20 Amps, Full Hookups, KOA Patio® Paw Pen</b> — патио-мебель, костровая яма. До 6 человек. Подтверждено под Motorhome 32 фута со слайдами.
+   <br><b>Стоимость:</b> $119.00/ночь + дрова $9.49 + аренда кострового кольца $9.49 + розжиг $1.89 + вода $4.99 − скидка KOA Rewards 10% ($20.17) = <b>$165.03</b> — полностью оплачено.
+   <br><b>На территории:</b> бассейн, крытый хот-таб, сауна, мини-гольф, прокат велосипедов, дог-парк. Ближайший кемпинг к Sandia Peak Tramway.
+   <br>Телефон: <span class="phone">1-505-296-2729</span>.`},
+
+  {title:'Big Texan RV Ranch', date:'04–05.08',
+   detail:'Оплачено $79.00. RV Site, Deluxe Pull-Thru, Full Hookups.',
+   full:`<span class="addr">1414 Sunrise Dr, Amarillo, TX 79104</span>
+   <br>Номер подтверждения: <span class="mono">12498999</span>
+   <br>Место: RV Site, Deluxe Pull-Thru, Full Hookups.
+   <br>Стоимость: <b>$79.00</b> (карта Дмитрия — спишется за 1 день до заезда, не сейчас).
+   <br><b>Отмена:</b> менее чем за 24 часа до заселения — штраф в размере 1 дня проживания. Изменения — бесплатно за 24+ часа, без сервисного сбора. Отмена/изменения — только напрямую с отелем.`},
+
+  {title:'The Big Texan Steak Ranch — ужин', date:'04.08, 18:00',
+   detail:'Бронь подтверждена (OpenTable). Бесплатный лимузин от кемпинга.',
+   full:`<span class="addr">7701 I-40, Amarillo, TX 79118</span>
+   <br>Confirmation #: <span class="mono">539128</span> (OpenTable). Вторник, 04.08, 18:00, на 4 человека. Host: Ярослав М.
+   <br>Special request: запрошен бесплатный лимузин от Big Texan RV Ranch.
+   <br>⚠️ <b>Grace period — 15 минут.</b> При опоздании более 15 мин после 18:00 — обязательно позвонить: <span class="phone">(806) 372-6000</span>.
+   <br><b>Лимузин:</b> бесплатный, часть сервиса ресторана, работает 16:00–21:00 — забирает от места стоянки и везёт обратно.
+   <br><b>Запасной вариант</b> (если задержитесь после 21:00): Uber, ~$7-10 в одну сторону, лучше бронировать заранее через приложение.
+   <br>Отмена: явной штрафной политики в подтверждении нет (OpenTable, бесплатная бронь) — отменить можно через приложение/сайт или звонком.`},
+
+  {title:'The Vineyards Campground', date:'05–07.08',
+   detail:'Оплачено $183.34. Место Premium Water Front Pull Through-83.',
+   full:`<span class="addr">1501 N Dooley St, Grapevine, TX 76051</span>
+   <br>Подтверждение: <span class="mono">#I00000089430</span>
+   <br>Место: <b>Premium Water Front Pull Through-83</b>
+   <br>Оплачено: $183.34 (карта Ярослава) — полностью, доплат не ожидается.
+   <br><br><b>Отмена:</b> &gt;14 дней до заезда — штраф $15. &lt;14 дней — списывается стоимость первой ночи полностью. Ранний выезд — деньги за оставшиеся дни не возвращаются.`},
+
+  {title:'French Quarter RV Resort', date:'07–09.08',
+   detail:'Оплачено $343.50. FHU-BI Premium (место не выбирается).',
+   full:`<span class="addr">500 N Claiborne Ave, New Orleans, LA 70112</span>
+   <br>Подтверждение: <span class="mono">Z8LFYGY8LS</span>
+   <br>Тип места: <b>FHU-BI PREMIUM</b> (под 4 чел., конкретный номер не выбрать)
+   <br>Оплачено: $343.50 (карта Дмитрия Приор) — полностью, доплат не ожидается.
+   <br><br><b>Заезд/выезд:</b> строго 12:00 → 11:00. Опоздание с выездом = штраф в размере ещё одной ночи.
+   <br><b>Отмена:</b> &gt;7 дней — возврат за вычетом $50. ≤7 дней — вернут только 50%. В день заезда — без возврата. Отмена <b>только по телефону: 504-586-3000</b>.
+   <br><b>Чистота:</b> мусор — самостоятельно в красный контейнер, штраф $100 за оставленный мусор.`},
+
+  {title:'Camp Gulf RV Park', date:'09–10.08',
+   detail:'Оплачено $213.29. Beach Site 703, макс. 51×20 футов.',
+   full:`<span class="addr">10005 Emerald Coast Pkwy W, Miramar Beach, FL 32550</span>
+   <br>Confirmation Code: <span class="mono">36288689</span>
+   <br>Место: <b>703, Beach Site</b> (2-я линия от воды, макс. 51 фут длина / 20 футов ширина — ваш кэмпер спокойно укладывается). Beachfront-места (1-я линия) уже забронированы на год вперёд — расписаны заранее, недоступны.
+   <br>💡 Настоятельно рекомендуют сначала пройти споты пешком, прежде чем заезжать на кэмпере.
+   <br>Оплачено: $213.29 = $189 site + $20.79 налог + $3.50 сбор за онлайн-бронь (карта Дмитрия) — полностью, доплат нет.
+   <br><b>Отмена:</b> невозвратный резервационный сбор = 2 ночи аренды. Возврат остатка — при отмене за 7+ дней. Ранний выезд без возврата.
+   <br><b>Гольф-кары:</b> только электрические, $5/день, регистрация в офисе при заезде.
+   <br>💡 Скачать приложение "Camping On The Gulf" — расписание активностей и фудтраков.
+   <br>Общий телефон: (850) 502-5282, reservations@campingonthegulf.com.
+   <br><br><b>Правила:</b>
+   <ul>
+   <li>Заезд с 12:00, выезд до 11:00 (CST)</li>
+   <li>Тишина: 22:00–08:00</li>
+   <li><b>Настоятельно рекомендуют сначала пройти споты пешком</b>, прежде чем заезжать на кэмпере</li>
+   <li>Канализационный шланг — обязательно нарезное соединение (screw-in)</li>
+   <li><b>Слив серой воды на землю запрещён</b> (закон Флориды), влажные салфетки в канализацию нельзя</li>
+   <li>Мыть кэмпер на споте запрещено</li>
+   <li>Костры — только в fire pits, зола/мусор на песке — штраф $50</li>
+   <li>Алкоголь на улице — только в упаковке/непрозрачном стакане, в зданиях нельзя</li>
+   <li>Сушить вещи — только за кэмпером, не на видных местах</li>
+   </ul>`},
+];
+
+const bookingsTodo = [
+  {title:'Miami Everglades RV Resort', urgent:true, detail:'7 ночей (10–17.08) — самая длинная стоянка, высокий сезон. Забронировать в первую очередь.'},
+  {title:'Fort Worth Stockyards', urgent:false, detail:'06.08 — день отдыха в Далласе.'},
+  {title:'Private Airboat Tour', urgent:false, detail:'08.08, болота Луизианы, ~$450–600.'},
+  {title:'Preservation Hall — Big Shot VIP', urgent:true, detail:'08.08 — билеты разбирают день открытия продаж.'},
+];
+
+const reference = [
+  {h:'🚨 Экстренные контакты', body:`<b>On Road Care (24/7):</b> <span class="phone">+1-800-367-4707</span> — при любой поломке, ДТП, странном запахе газа. Не звонить в локальный кемпинг вместо этого.
+   <br><b>При ДТП:</b> обязательно вызвать полицию и получить Police Report — без него VIP Plus страховка не покроет ущерб.
+   <br><b>Ремонт без согласования:</b> лимит <b>$75–$100</b> (разные источники называют разные цифры — Rental Contract говорит $75, а официальное подтверждение check-in говорит $100; на практике лучше звонить в поддержку при любой сумме сомнений), выше — только с одобрения поддержки.
+   <br><b>Срок подачи претензий:</b> 45 дней с момента возврата кэмпера.`},
+
+  {h:'📄 Документы на въезд/выезд', body:`<b>3 водителя (не Ярослав):</b> международное водительское удостоверение (МВУ) + физические польские права.
+   <br><b>Ярослав:</b> калифорнийские права — самодостаточны, МВУ не требуется.
+   <br><b>Все:</b> загранпаспорта на приёмке кэмпера.
+   <br><b>Оплата депозита:</b> $1500, строго кредитная карта (Visa/MasterCard/Amex) на имя главного водителя — дебетовые и наличные не принимаются.`},
+
+  {h:'🏞️ America the Beautiful Pass', body:`С 2026 года нерезиденты платят $100/чел за вход в 11 топовых нацпарков (включая Zion, Bryce, Grand Canyon), если нет пасса.
+   <br>✅ <b>Куплен и оплачен</b> — 2026 Digital Resident Annual Pass, на имя <b>Yaroslav Malashchenko</b>.
+   <br>Pass ID: <span class="mono">2fd600b1-4a2d-54ad-8dab-5a38947464fc</span>
+   <br>Reservation #: <span class="mono">0856250081-1</span>
+   <br>Оформлен: 17.07.2026 · Действует до: 31.07.2027
+   <br>Код: <span class="mono">0727YA2C1726AN</span>
+   <br>Покрывает Ярослава + 3 доп. взрослых во всех парках маршрута — держите цифровую версию в телефоне (скриншот у всех четверых на случай проверки).`},
+
+  {h:'🛣️ Платные дороги — стратегия', body:`Транспондер не нужен нигде на маршруте — все 3 рискованные зоны обходятся бесплатными дублёрами:
+   <ul>
+   <li><b>Лос-Анджелес:</b> держаться правых/средних полос, не заезжать на Metro ExpressLanes (I-10/I-110)</li>
+   <li><b>Даллас:</b> навигатор в режиме "Avoid tolls" уводит на I-35W/I-20 в обход NTTA</li>
+   <li><b>Флорида:</b> ехать по бесплатной I-95 вместо электронной Florida's Turnpike</li>
+   </ul>
+   Держите тумблер "Avoid tolls" включённым в Google Maps/Waze всю поездку. Штраф за случайный проезд под камерой — $25 админсбор + сама плата.`},
+
+  {h:'🚐 Кэмпер: баки и генератор', body:`<b>Слив баков:</b> сначала BLACK (туалет) → промывка 10л воды → закрыть → затем GREY (душ/раковина) — она промоет шланг. После — таблетка-септик в унитаз.
+   <br><b>Генератор:</b> $3.50/час без пакета, либо $14/день безлимит. Прогрев 3–4 минуты перед использованием техники.
+   <br><b>Топливо:</b> только Regular Unleaded (бензин), бак ~208л. Возврат — с тем же уровнем топлива, что при получении.
+   <br><b>Уровень масла и шины:</b> проверять по утрам "на холодную", особенно после пустынных перегонов (Barstow–Вегас).`},
+
+  {h:'⚠️ Тоннель Zion — критично', body:`С 7 июня 2026 тоннель Zion-Mt. Carmel закрыт для транспорта выше 11'4" (3.45м) или шире 7'10" (2.39м). Ваш кэмпер (3.7м/2.6м) не проходит.
+   <div class="warn-box">Въезд в Zion — только South Entrance. Для переезда в Bryce — объезд Springdale → Kanab → US-89, закладывайте +1.5 часа к таймингу.</div>`},
+
+  {h:'📱 Полезные приложения', body:`<b>Roadtrippers</b> — поиск кемпингов и точек по пути (в бесплатной версии — до 7 точек на маршрут, разбивайте по сегментам).
+   <br><b>Recreation.gov</b> — хранение цифрового America the Beautiful Pass, мониторинг изменений правил парков.
+   <br><b>GasBuddy / Trucker Path</b> — заправки, подходящие для RV (Pilot/Flying J/Love's/TA).
+   <br><b>Ticketmaster</b> — обязательно для входа на The Sphere.`},
+];
+
+const fuelStops = [
+  {day:'День 1', place:'Pilot Travel Center, Jean, NV', why:'Перед въездом в Вегас — полный бак закрывает топливо до Kanab (Day 4), избегает утренней заправки перед выездом.', addr:'Jean, NV'},
+  {day:'День 3', place:'Mesquite, NV', why:'Опционально — бак и так почти полон после Jean, заезд только ради разницы в цене бензина (в Юте дороже).', addr:'Mesquite, NV'},
+  {day:'День 4', place:'Maverik, 590 E 300 S, Kanab, UT', why:'Обязательная — разбивает длинный отрезок Zion→Bryce→Page на два безопасных куска. Подтверждено RV-friendly.', addr:'590 E 300 S, Kanab, UT 84741'},
+  {day:'День 5', place:'Maverik, 701 Tunnel Rd, Page, AZ', why:'После тура в Antelope Canyon, по пути в кемпинг — закрывает топливо на день и на утро Day 6.', addr:'701 Tunnel Rd, Page, AZ 86040'},
+  {day:'День 6', place:'Desert View Watchtower — АЗС на месте', why:'Во время остановки у башни — готовит к длинному Day 7 (600 км, самый долгий перегон).', addr:'Desert View, Grand Canyon'},
+  {day:'День 7', place:'Район Gallup, NM', why:'Grand Canyon→Albuquerque (~660км) — рекомендуется промежуточная дозаправка, особенно с полным баком после Desert View.', addr:'Gallup, NM'},
+  {day:'День 8', place:'TA Albuquerque, 2501 University Blvd NE, Albuquerque, NM 87107', why:'От Gallup (День 7) до Амарилло — 857 км, далеко за пределом бака. Обязательна заправка в начале Дня 8, иначе не хватит даже до Тукумкари (672 км > safe range). Требует крюка ~10-15 мин от кемпинга.', addr:'2501 University Blvd NE, Albuquerque, NM 87107'},
+  {day:'День 9', place:'TA Amarillo, 7000 E. Interstate 40, Amarillo, TX 79118', why:'Заправка в начале дня — от Albuquerque до Wichita Falls без дозаправки в Amarillo вышло бы за пределы безопасного запаса (868 км без остановки).', addr:'7000 E. Interstate 40, Amarillo, TX 79118'},
+  {day:'День 9', place:'Walmart Supercenter, 2700 Central Freeway, Wichita Falls, TX 76305', why:'Амарилло→Даллас (~547км) — вторая заправка + заодно закупка продуктов, круглосуточно.', addr:'2700 Central Freeway, Wichita Falls, TX 76305'},
+  {day:'День 11-12', place:'Shreveport, LA + повторно район Baton Rouge, LA', why:'Даллас→Новый Орлеан (790км) — требует двух дозаправок.', addr:'Shreveport, LA / Baton Rouge, LA'},
+  {day:'День 14', place:'Район Tallahassee, FL → район Daytona/Cocoa, FL → финальная перед Майами', why:'Дестин→Майами (1040км) — три дозаправки, удобно совместить со сменой водителей каждые 2 часа.', addr:'Tallahassee, FL / Daytona, FL'},
+];
+
+const contacts = [
+  {group:'Экстренные', items:[
+    {name:'On Road Care (El Monte, 24/7)', phone:'+1-800-367-4707'},
+  ]},
+  {group:'Кэмпер / аренда', items:[
+    {name:'El Monte RV — станция Лос-Анджелес', phone:'+1 (562) 404-9300'},
+    {name:'USAkamperem.pl (посредник)', phone:'+48 667 900 837', extra:'kontakt@usakamperem.pl'},
+  ]},
+  {group:'День 3 — Zion', items:[
+    {name:'Ride Zion Adventures (приватный e-bike тур, #DAXPYS)', phone:'435-200-5260', extra:'privatetours@ridezion.com'},
+    {name:'Zion River Resort (кемпинг)', phone:'—'},
+  ]},
+  {group:'День 5 — Page / Antelope Canyon', items:[
+    {name:'Horseshoe Bend Tours (combo-тур Antelope Canyon + Horseshoe Bend)', phone:'(435) 275-4594', extra:'info@horseshoebendtours.com'},
+    {name:'Wahweap Marina (аренда лодок)', phone:'928-645-2433'},
+    {name:'Lake Powell Resorts & Marinas / Aramark (Canyon Princess Dinner Cruise)', phone:'928-645-1064 / 928-645-2433', extra:'lpboattours@aramark.com'},
+  ]},
+  {group:'День 6 — Grand Canyon', items:[
+    {name:'Xanterra Taxi Service (круглосуточно)', phone:'928-638-2631'},
+    {name:'El Tovar Dining Room (бронь стола)', phone:'888-297-2757'},
+  ]},
+];
+
+const documents = [
+  {title:'Ваучер бронирования — KYK544644/1', lang:'EN', meta:'El Monte RV · CRV Sp z o.o.',
+   body:`<h4>Что это</h4>
+   <p>Официальный ваучер на аренду, предъявляется при получении кэмпера в Los Angeles.</p>
+   <h4>Ключевые данные</h4>
+   <ul>
+   <li>Категория: <b>FS / El Monte — Class C 30–32 ft (Slide-Out)</b></li>
+   <li>Пассажиры: Dmitry Malashchenko + 3 (всего 4)</li>
+   <li>Получение: Los Angeles (LAX), <b>26.07.2026 после 13:00</b> — <span class="addr">12818 Firestone Blvd, Santa Fe Springs, CA 90670</span>, +1 (562) 404-9300</li>
+   <li>Возврат: Miami (MIA), <b>17.08.2026 до 10:30</b> — <span class="addr">13700 SW 248th St, Princeton (Miami), FL 33032</span></li>
+   <li>Часы работы станции LA: пн-пт 08:00–17:00, сб-вс 08:00–16:00 (с 01.04 по 30.09.2026)</li>
+   </ul>
+   <h4>Что предоплачено (пакеты Platinum + All Inclusive)</h4>
+   <ul>
+   <li>Platinum Package, All Inclusive Package</li>
+   <li>Supplemental Liability Insurance (SLI)</li>
+   <li>VIP Plus Upgrade (франшиза за повреждения обнулена)</li>
+   </ul>
+   <h4>Обязательно сделать</h4>
+   <p>Self Check-In не позднее чем за 30 дней до получения: <a href="https://elmonterv.sci.thlonline.com/" target="_blank">elmonterv.sci.thlonline.com</a></p>`,
+   full:`<h4>Полное содержание ваучера</h4>
+   <h5>Станция получения</h5>
+   <p>Los Angeles, California — <span class="addr">12818 Firestone Blvd., Santa Fe Springs, CA 90670</span>, тел. +1 (562) 404-9300.</p>
+   <h5>Время работы станции</h5>
+   <p>Период 01.04.2026–30.09.2026: пн–пт 08:00–17:00, сб–вс 08:00–16:00. Период 01.10.2026–31.03.2027: пн–пт 09:00–16:00, сб–вс 09:00–16:00 (после вашей поездки, для справки).</p>
+   <h5>Время получения / возврата</h5>
+   <p>Получение — после 13:00. Возврат — до 10:30.</p>
+   <h5>Данные брони</h5>
+   <p>Пассажиры: Dmitry Malashchenko. Число пассажиров: 4. Агентство: CRV Sp z o.o. Номер ваучера: <b>KYK544644/1</b>.</p>
+   <h5>Категория и маршрут</h5>
+   <p>Категория: <b>FS</b>. Пункт получения: Los Angeles (LAX). Пункт сдачи: Miami (MIA). С 26 июля 2026 по 17 августа 2026.</p>
+   <h5>Таблица включённых и невключённых опций</h5>
+   <p>Формат: опция — предоплачено / оплата на станции.</p>
+   <ul>
+   <li>Preparation fee — нет / нет (включена в пакет)</li>
+   <li>Additional Driver — нет / нет (снята по пакету Platinum)</li>
+   <li>Platinum Package — <b>да</b> / нет</li>
+   <li>Awning enablement — нет / нет</li>
+   <li>Кемпинговые кресла — 0 предоплачено / <b>4 на станции</b></li>
+   <li>Peace of Mind — нет / нет</li>
+   <li>Базовый пакет (Podstawowy pakiet) — нет / нет</li>
+   <li>All Inclusive Package — <b>да</b> / нет</li>
+   <li>500-мильный пакет — 0 / 0</li>
+   <li>Unlimited Mileage — нет / нет (входит в другой пакет)</li>
+   <li>Кухонный набор — нет / нет</li>
+   <li>Linen Kit (TP) — 0 / 0</li>
+   <li>Supplemental Liability Insurance (SLI) — <b>да</b> / нет</li>
+   <li>VIP Plus Upgrade (TP) — <b>да</b> / нет</li>
+   <li>Безлимитный генератор — нет / нет</li>
+   <li>P.A.D. (Priority AM Departure) — нет / нет</li>
+   <li>Кофеварка — нет / нет</li>
+   <li>Тостер — нет / нет</li>
+   <li>Предоплаченный WiFi/4G хотспот — нет / нет</li>
+   <li>Drop and Go (TP) — нет / нет</li>
+   <li>Mexico Auto Liability Insurance — нет / нет</li>
+   </ul>
+   <p><b>Налоги на предоплаченные позиции уже включены.</b> Всё, что оплачивается на станции, облагается местным налогом дополнительно.</p>
+   <h5>Обязательное условие</h5>
+   <p>Self Check-In нужно пройти не позднее чем за 30 дней до отправления — ссылка на регистрацию: elmonterv.sci.thlonline.com</p>`},
+
+  {title:'Email-подтверждение брони + инструкции', lang:'PL/EN', meta:'USAkamperem.pl, 23.05.2026',
+   body:`<h4>Что это</h4>
+   <p>Письмо с подтверждением полной оплаты и вложениями: ваучер, Guest Guide, Warunki Najmu, Rental Contract.</p>
+   <h4>Важные пункты из письма</h4>
+   <ul>
+   <li><b>Карта кредитная</b> обязательна на месте для депозита</li>
+   <li><b>Права:</b> для получения кэмпера необходимо физическое польское право категории B (+ МВУ для трёх водителей)</li>
+   <li>Walkthrough видео по кэмперу: <a href="https://vimeo.com/1091096468" target="_blank">vimeo.com/1091096468</a></li>
+   <li>Зимний период (не ваш случай, но на будущее): с 31.10 по 31.03 кэмперы могут быть законсервированы (winterized)</li>
+   <li>Возврат кэмпера — между 08:00 и 10:30 (до 11:00 без трансфера)</li>
+   </ul>
+   <h4>Страхование (не входит, рекомендация)</h4>
+   <p>Ссылки на WARTA: туристическая страховка + страхование от отмены поездки — оформляются отдельно, за вами.</p>`,
+   full:`<h4>Полный перевод письма (сжато, по сути)</h4>
+   <p><i>Тема: "Пакуй чемоданы! Твой ваучер на кэмпер уже ждёт: резервация KYK544644/1"</i>. Отправлено 23.05.2026 в 20:01 от Usakamperem на адрес Дмитрия, копия — на служебный адрес kasia@usakamperem.pl.</p>
+   <p>"Ваше путешествие на кэмпере выходит на финальный этап! Спасибо за полную оплату. Во вложении — ваучер, необходимый для получения кэмпера, и авансовая фактура, подтверждающая оплату."</p>
+   <h5>Что дальше (по шагам из письма)</h5>
+   <ul>
+   <li><b>Self Check-In (SCI):</b> за 30 дней до получения придёт письмо напрямую от El Monte со ссылкой на электронную регистрацию. Нужно заполнить все данные и принять документы — это обязательный шаг перед получением кэмпера.</li>
+   <li>Далее в письме — сводка брони: тип кэмпера (El Monte, большой кэмпер C30–32 Slide-Out), период аренды, дата получения 26.07.2026.</li>
+   <li><b>Кредитная карта:</b> отдельно напомнили, что для оплаты депозита на месте понадобится кредитная карта.</li>
+   <li><b>Права:</b> для получения кэмпера необходимо физическое польское право категории B.</li>
+   </ul>
+   <h5>Список вложений и материалов, на которые дают ссылки</h5>
+   <ul>
+   <li><b>Guest Guide</b> — практическая инструкция по поездке, получению и сдаче кэмпера (вложение)</li>
+   <li><b>Контракт найма (Rental Contract)</b> — документ, который подписывается на месте при получении, на английском. В письме советуют ознакомиться заранее и, при необходимости, использовать Google Translate, поскольку именно этот документ подписывается в момент получения (вложение)</li>
+   <li><b>SWN — сокращённые условия найма</b> — краткое изложение контракта на польском, подготовленное USAkamperem, не является юридически обязывающим документом (вложение)</li>
+   <li><b>FAQ</b> — ответы на частые вопросы: usakamperem.pl/faq</li>
+   <li><b>Инструктажное видео</b> по кэмперу: vimeo.com/1091096468</li>
+   <li><b>Зимняя аренда</b> (справочно, не ваш случай): если получение приходится на период с 31 октября по 31 марта, кэмпер может быть законсервирован (winterized) — отключена водяная система, нельзя пользоваться туалетом/душем/водой. Подробности по ссылке в письме.</li>
+   <li><b>Платные дороги в США:</b> ссылка на отдельный документ с информацией по толлам — расходы несёт водитель.</li>
+   <li><b>Возврат кэмпера:</b> сдать нужно между 08:00 и 10:30 утра (или до 11:00, если не пользуетесь трансфером). Перед сдачей — опустошить баки, заправить топливо и газ, убрать салон. За беспорядок, мусор или невыполненные обязанности могут начислить дополнительные платежи. Подробности — по ссылке на отдельный документ.</li>
+   </ul>
+   <h5>Про страхование</h5>
+   <p>"Рекомендуем оформить туристическую страховку, а также страховку от отмены поездки на случай непредвиденных обстоятельств перед поездкой или во время неё." Приведены ссылки на калькулятор WARTA — внешнего страховщика, которым пользуется сама компания USAkamperem для своих поездок. Отдельно — ссылка на страхование расходов на случай отмены или прерывания поездки (перелёты, отель, аренда кэмпера, билеты на аттракционы).</p>
+   <h5>Контакты</h5>
+   <p>Команда USAKamperem: kontakt@usakamperem.pl, тел. +48 667 900 837.</p>
+   <h5>Приложенные файлы (4 шт.)</h5>
+   <p>voucher.pdf (219K) · 2025-thl-USA-El-Monte-RV-Class-C-Guest-Guide-EN-05.01.pdf (3911K) · WARUNKI-NAJMU---El-Monte.pdf (150K) · Rental-Contract.pdf (144K)</p>`},
+
+  {title:'Faktura zaliczkowa — Z2026/06/30/ONL', lang:'PL', meta:'CRV Sp. z o.o.',
+   body:`<h4>Что это</h4>
+   <p>Авансовый счёт-фактура на полную оплату аренды кэмпера.</p>
+   <ul>
+   <li>Заказ: <span class="mono">ZAM2026/06/12/ONL</span>, резервация <span class="mono">KYK544644/1</span></li>
+   <li>Покупатель: Dmitry Malashchenko, Sarmacka 11-32, 02-972 Warszawa</li>
+   <li>Сумма: <b>11 093,84 USD</b>, оплачено полностью 16.06.2026 картой</li>
+   <li>Банк: Nest Bank, VAT "NP" по art.28j ust.1 ustawy o VAT (услуга связана с недвижимостью/арендой за пределами ЕС — НДС не применяется)</li>
+   </ul>`,
+   full:`<h4>Полное содержание счёта</h4>
+   <h5>Продавец</h5>
+   <p>CRV Sp. z o.o., ul. Konstantego Ildefonsa Gałczyńskiego 2/16, 43-300 Bielsko-Biała, Польша. NIP 9372765726. Email kasia@usakamperem.pl, сайт www.usakamperem.pl, телефон 667900837.</p>
+   <h5>Покупатель</h5>
+   <p>Dmitry Malashchenko, Sarmacka 11-32, 02-972 Warszawa, Польша.</p>
+   <h5>Позиция счёта</h5>
+   <p>Аванс за выполнение заказа <span class="mono">ZAM2026/06/12/ONL</span>: услуга резервации кэмпера, резервация № <span class="mono">KYK544644/1</span>. Валовая стоимость: 11 093,84 USD.</p>
+   <h5>Разбивка сумм</h5>
+   <p>Чистая стоимость: 11 093,84 USD · НДС 0% (np — не подлежит) · Валовая: 11 093,84 USD.</p>
+   <h5>Оплата</h5>
+   <p>К оплате: 0,00 USD (уже всё оплачено). Оплачено: 11 093,84 USD 16.06.2026. Срок платежа был: 17.06.2026. Способ: карта оплаты. Банк: Nest Bank, счёт PL08187010452078108401580001.</p>
+   <p>Примечание в счёте: "Заказ; НДС 'NP' на основании ст.28j п.1 закона о НДС" — это означает, что услуга резервации кэмпера для использования за пределами ЕС не облагается польским НДС.</p>
+   <p>Дата выставления: 16.06.2026. Дата продажи: 23.05.2026 (дата исходного заказа).</p>`},
+
+  {title:'Regulamin serwisu USAkamperem.pl', lang:'PL', meta:'Действует с 01.06.2025',
+   body:`<h4>Что это</h4>
+   <p>Общие условия пользования сайтом-посредником USAkamperem.pl (CRV Sp. z o.o.). Регулирует не саму аренду, а отношения с сайтом-посредником.</p>
+   <h4>Ключевой момент — кто за что отвечает</h4>
+   <ul>
+   <li>USAkamperem.pl — это <b>посредник</b>, а не сторона договора аренды. Договор аренды заключается напрямую с El Monte RV на месте, в момент получения кэмпера.</li>
+   <li>Ответственность самого сайта-посредника <b>ограничена суммой уплаченных ему комиссий</b>, максимум 1000 zł — то есть по вопросам самого кэмпера, поломок, обслуживания претензии нужно адресовать El Monte, а не USAkamperem.pl.</li>
+   <li>Право на отказ от договора (14 дней) <b>не действует</b> для услуги аренды авто/кэмпера (ст. 38 Ustawy o Prawach Konsumenta) — это стандартное исключение для услуг с фиксированной датой.</li>
+   </ul>
+   <h4>Контакты посредника</h4>
+   <p>kontakt@usakamperem.pl, +48 667 900 837</p>`,
+   full:`<h4>Полный перевод по разделам (18 разделов регламента)</h4>
+   <h5>1. Общие положения</h5>
+   <p>Владелец сервиса USAkamperem.pl — компания CRV Sp. z o.o., Bielsko-Biała, KRS 0001134776, NIP 9372765726, уставный капитал 5000 zł. Регламент не ограничивает права потребителей, установленные обязательным законодательством — при противоречии приоритет у закона.</p>
+   <h5>2. Роль USAkamperem.pl</h5>
+   <p>Сервис — это платформа для поиска и сравнения предложений аренды кэмперов, предоставляемых партнёрами (в вашем случае — El Monte RV). Через сайт можно оформить и оплатить резервацию. <b>Заявки на резервацию не равнозначны заключению договора найма</b> — итоговый договор аренды заключается напрямую между клиентом и выбранным партнёром (El Monte) в момент и на месте получения кэмпера. Резервация становится обязывающей после её оплаты клиентом и подтверждения сервисом.</p>
+   <p>Роль сервиса — только техническое посредничество: обеспечить приём заявки и передачу её партнёру. <b>Сервис не отвечает за выполнение услуги найма самого кэмпера</b> — эта ответственность целиком на партнёре (El Monte).</p>
+   <h5>3. Общие условия пользования сайтом</h5>
+   <p>Пользователь обязан предоставлять достоверные данные, не рассылать спам через сервис, не нарушать работу сайта. Для использования сайта нужен браузер с поддержкой cookies и JavaScript.</p>
+   <h5>4. Электронные услуги на сайте</h5>
+   <p>Доступны: блог, форма резервации, рассылка (Newsletter), поиск. Все услуги самого сайта бесплатны, кроме обязательства оплаты, возникающего при оформлении резервации.</p>
+   <h5>5. Условия подачи резервации и заключения договора найма</h5>
+   <p>Схема: клиент подаёт заявку через форму → получает автоматическое письмо-подтверждение получения заявки → после оплаты сервис подтверждает приём резервации, высылая "Podsumowanie Rezerwacji" (сводку резервации) с условиями будущего договора найма и сокращёнными условиями партнёра. <b>Подтверждение резервации — это ещё не договор найма.</b> Сам договор найма заключается только в момент получения кэмпера у партнёра, через подписание физического контракта на месте.</p>
+   <h5>6. Оплата за пользование услугами</h5>
+   <p>При резервации возникает обязательство оплаты резервационного взноса, засчитываемого в счёт полной стоимости аренды. Стандартно: взнос 10% от полной стоимости, но не менее 300 условных единиц валюты, оплачивается сразу при резервации. Остаток — не позднее чем за 10 недель до начала аренды (либо сразу, если между резервацией и началом аренды меньше 10 недель). Платежи обрабатывает внешний провайдер Stripe.com (Stripe Payments Europe, Ltd., Дублин, Ирландия).</p>
+   <h5>7. Условия реализации договора найма, права и обязанности клиента и прокатчика</h5>
+   <p>Прокатчик обязан предоставить исправный кэмпер в оговорённый срок и месте; клиент обязан оплатить аренду, забрать и вернуть кэмпер в срок и месте по резервации, использовать его согласно правилам эксплуатации прокатчика (OWN). Выдача/приём кэмпера может сопровождаться письменным актом приёма-передачи, фиксирующим состояние машины. Клиент не вправе передавать кэмпер третьим лицам без согласия прокатчика; с момента получения на клиента переходит риск утраты/повреждения кэмпера. Все текущие эксплуатационные расходы (топливо, мойка и т.п.) — на клиенте.</p>
+   <h5>8. Персональные данные</h5>
+   <p>Администратор данных, связанных с использованием сайта — сам сервис (USAkamperem.pl). Администратор данных, связанных с исполнением договора найма — партнёр (El Monte).</p>
+   <h5>9. Контакты с USAkamperem.pl</h5>
+   <p>Email kontakt@usakamperem.pl, телефон +48 667 900 837.</p>
+   <h5>10–11. Порядок рассмотрения жалоб</h5>
+   <p>Жалобы на работу самого сайта и на услугу резервации — к USAkamperem.pl (ответ в течение 14 дней). <b>Жалобы, связанные с самой услугой аренды кэмпера</b> (неполадки, повреждения, качество обслуживания) — направляются <b>напрямую партнёру (El Monte)</b> по контактам из сводки резервации; сервис в этом не участвует и не выносит решений от имени партнёра, хотя может добровольно помочь с коммуникацией.</p>
+   <h5>12. Право на отказ от договора</h5>
+   <p>Стандартное право потребителя на отказ от договора, заключённого дистанционно, в течение 14 дней — <b>не распространяется на услугу найма кэмпера</b>, поскольку это услуга с фиксированной датой оказания (аренда автомобиля, гостиничные услуги и подобное прямо исключены законом о правах потребителей, ст. 38).</p>
+   <h5>13. Внесудебные способы разрешения споров</h5>
+   <p>Информация о медиации, примирительном производстве, арбитраже — через сайт Управления по защите конкуренции и потребителей (UOKiK) и платформу ODR Евросоюза.</p>
+   <h5>14. Положения для предпринимателей</h5>
+   <p>Не относится к вам как к потребителю — эти пункты касаются только B2B-клиентов сервиса.</p>
+   <h5>15. Технические перерывы</h5>
+   <p>Сервис не гарантирует бесперебойную работу сайта (форс-мажор, DDOS-атаки и т.п.), но обязан заранее уведомлять о плановых технических работах.</p>
+   <h5>16. Авторские права</h5>
+   <p>Весь контент сайта защищён авторским правом сервиса и его партнёров.</p>
+   <h5>17. Незаконный контент</h5>
+   <p>Положения о модерации пользовательского контента (комментарии, отзывы) согласно Акту о цифровых услугах ЕС — не относится к сути вашей аренды.</p>
+   <h5>18. Заключительные положения</h5>
+   <p>Применимое право — польское. Регламент не ограничивает и не отменяет условия OWN (Ogólne Warunki Najmu) партнёра El Monte — при противоречии между регламентом сайта и условиями El Monte, <b>приоритет у условий El Monte</b>.</p>`},
+
+  {title:'Warunki Najmu / SWN El Monte (сокращённые условия)', lang:'PL', meta:'Действует 01.04.2026–31.03.2027',
+   body:`<h4>Что это</h4>
+   <p>Краткое изложение на польском условий аренды El Monte, подготовленное USAkamperem.pl — не является юридически обязывающим документом (им является Rental Contract, см. ниже), но удобно для быстрой сверки условий.</p>
+   <h4>Ключевые суммы</h4>
+   <ul>
+   <li>Возвратный депозит: <b>$1500</b> (при фестивалях типа Burning Man — $2500), только кредитная карта</li>
+   <li>Доплата за доп. водителей: $6.50/день — <b>снята</b> по пакету Platinum</li>
+   <li>Генератор: $14/день безлимит, либо $3.50/час без пакета</li>
+   <li>Preparation fee $260 — включена в Premium/ваш пакет</li>
+   <li>Мин. возраст водителя: 21 год, требуется МВУ категории B</li>
+   </ul>
+   <h4>Правила отмены (для справки, вы не отменяете)</h4>
+   <ul>
+   <li>70+ дней до заезда: удерживают $300</li>
+   <li>0–24 дня до заезда: удерживают 100% суммы</li>
+   </ul>
+   <h4>Зоны с потерей страховки</h4>
+   <p>Death Valley (1 июня – 30 сентября), off-road, Манхэттен, Мексика без MALI — подробнее в разделе "Справочник".</p>`,
+   full:`<h4>Полный перевод сокращённых условий SWN El Monte</h4>
+   <h5>Основные данные</h5>
+   <p>Период действия условий: 01.04.2026–31.03.2027. Мили в стандартном пакете не включены отдельно от вашего пакета. Доплата за доп. водителя: $6.50/день (снята по Platinum). Минимальный возраст водителя — 21 год. Права — международное водительское удостоверение категории B. Минимальный срок аренды — 7 дней. Оплата при получении — только кредитная карта (Visa, MasterCard, American Express), дебетовые карты и наличные не принимаются. Трансфер на станцию не предоставляется. Кэмпер можно забрать в день прилёта, но рекомендуется на следующий день — во избежание проблем при задержках рейса; неявка в выбранный слот считается "no show" и может привести к утрате резервации без возврата денег.</p>
+   <h5>Условия аннулирования резервации (справочно)</h5>
+   <ul>
+   <li>Более 70 дней до получения: удерживают $300</li>
+   <li>40–69 дней: удерживают 30% суммы аренды + плата за one-way, если применимо</li>
+   <li>25–39 дней: удерживают 60% суммы + one-way</li>
+   <li>0–24 дня: удерживают 100% суммы + все дополнительные сборы (подготовка, сезонные надбавки, one-way)</li>
+   </ul>
+   <h5>Пакеты миль (обязателен выбор одного при резервации)</h5>
+   <ul>
+   <li>Пакет 500 миль — $215 (сверх лимита — $0.38/миля + налог штата)</li>
+   <li>Unlimited Mileage — $1230 за первые 21 день, далее $30/доп. день</li>
+   <li>Premium Package — $125/день: безлимитные мили + кухонный набор + личный набор на каждого + кемпинговые кресла + preparation fee</li>
+   </ul>
+   <h5>Опциональные дополнения</h5>
+   <ul>
+   <li>Linen kit (постель/полотенца) — $82/чел за весь срок</li>
+   <li>RV Essential Kit (кухонный набор) — $170 за кэмпер за весь срок</li>
+   <li>Генератор — $14/день безлимит, либо $3.50 за начатый час без пакета</li>
+   <li>Кемпинговое кресло — $16 + налог за штуку за весь срок</li>
+   <li>Столик кемпинговый — обычно бесплатно, часть стандартного оснащения</li>
+   <li>Hotspot (WiFi) — $15/сутки, включено 5GB</li>
+   <li>Багажник для велосипедов — доступен не везде, бронировать заранее нельзя</li>
+   <li>Услуга Drop & Go — $135 (сдать кэмпер без уборки/слива баков/вывоза мусора; недоступна при бронях на Burning Man)</li>
+   </ul>
+   <h5>Обязательные сборы на месте</h5>
+   <ul>
+   <li>Стандартный возвратный депозит — $1500, только кредитная карта</li>
+   <li>Депозит на время Burning Man/RAAM — $2500</li>
+   <li>Доплата за участие в Burning Man — $1000 (если не заявлено заранее — может списаться по геолокации)</li>
+   <li>Preparation fee — $260 (включена в Premium-пакет)</li>
+   <li>Colorado Road Safety Fee — $5.23/день (только для аренды в Денвере, не ваш случай)</li>
+   <li>New Jersey Security Fee — $5/день (только для аренды в Нью-Йорке, не ваш случай)</li>
+   <li>One Way fee — доплата за сдачу в другом городе (в вашем случае LA→Miami), сумма фиксирована и включена в общую стоимость аренды, доплачивать на месте не нужно</li>
+   </ul>
+   <h5>Платные дороги</h5>
+   <p>El Monte не оснащает кэмперы транспондерами. Вы отвечаете за все проезды: штраф до $100 за проезд по полосе "только транспондер"; при неоплаченном электронном толле — сумма толла + $25 административного сбора за каждое нарушение.</p>
+   <h5>Ограничения по территории</h5>
+   <p>Тоннель Zion закрыт для крупных кэмперов; Death Valley — запрет с 1 июня по 30 сентября; off-road — запрещено всегда; Мексика — только с доп. страховкой MALI, без возврата за ремонт/потерю аренды; Манхэттен — полный запрет; Аляска/Северная Канада — на свой риск, без возмещения; Онтарио/Квебек — нельзя оставлять кэмпер без присмотра в границах Монреаля, Оттавы, Квебек-Сити.</p>
+   <h5>Страхование</h5>
+   <p>Базовая ответственность (OC) — по минимальному уровню штата. SLI — расширяет до $500 000, входит автоматически в вашу бронь. VIP — ограничивает вашу финансовую ответственность за повреждения кэмпера максимум $1500 за случай (при соблюдении условий контракта). VIP Plus Upgrade — обнуляет эту франшизу до $0 при тех же условиях — входит в ваш пакет.</p>
+   <h5>Действия при поломке/аварии</h5>
+   <p>Roadside Support: +1-800-367-4707, круглосуточно. При аварии — обязателен официальный полицейский протокол для сохранения страхового покрытия.</p>
+   <h5>Прочее</h5>
+   <p>Реклама (жалобы на аренду) — подаются письменно, не позднее 60 дней после завершения аренды. Отсутствие фотофиксации и предварительного звонка на горячую линию во время поломки может лишить права на компенсацию.</p>`},
+
+  {title:'El Monte RV Guest Guide (Class C)', lang:'EN', meta:'39 страниц, обновлён 01.05.2025',
+   body:`<h4>Что это</h4>
+   <p>Полное официальное руководство по эксплуатации кэмпера — системы, безопасность, кемпинг-этикет, устранение неполадок.</p>
+   <h4>Разделы, которые реально пригодятся в первые дни</h4>
+   <ul>
+   <li><b>Перед выездом (стр. 8-9):</b> walk-around tour, ключи не оставлять в замке, парковка строго на ровной поверхности</li>
+   <li><b>Заправка (стр. 9):</b> только Regular Unleaded бензин, бак ~208л (55 галлонов)</li>
+   <li><b>TOW/HAUL режим (стр. 13):</b> обязательно использовать на спусках — кнопка на рычаге КПП, автоматически подтормаживает двигателем</li>
+   <li><b>Слайд-аут (стр. 23):</b> только на ровной стоянке, двигатель включён, парковочный тормоз затянут</li>
+   <li><b>Генератор (стр. 24):</b> прогрев 3-4 минуты перед использованием техники, не работает ночью в тихие часы кемпинга</li>
+   <li><b>Баки (стр. 30-31):</b> сначала BLACK, потом GREY, септик-таблетка после каждого слива</li>
+   <li><b>Аварийная ситуация:</b> On Road Care <span class="phone">1-800-367-4707</span> — работает 24/7</li>
+   </ul>
+   <h4>Троубл-шутинг (стр. 34-37)</h4>
+   <p>Таблицы по проблемам с генератором, печкой, водонагревателем, холодильником, слайдом — если что-то не работает в дороге, сначала сверьтесь с этими таблицами перед звонком в поддержку.</p>`,
+   full:`<h4>Развёрнутый перевод по разделам гайда</h4>
+   <h5>Частые вопросы (FAQ)</h5>
+   <p>Спецправа не нужны, но водителю от 21 года и с действующими правами страны проживания (цифровые/временные не подходят). GPS — обычно платно на месте, можно заказать заранее. Постельное бельё — своё или взять набор в аренду. Изменение даты возврата — по согласованию, доступность не гарантирована, возврат за неиспользованные ночи не положен. Изменение типа кэмпера — возможно по наличию, может повлечь доплату.</p>
+   <h5>Отмена бронирования (правила самого El Monte, справочно)</h5>
+   <p>Бесплатная отмена — в течение 48 часов после бронирования, если до поездки более 7 дней. Далее: за 8+ дней — $300; 4–7 дней — 75% от суточной ставки + one-way, если применимо (минимум $300); 3 дня и меньше или неявка — 100% полной стоимости аренды без возврата.</p>
+   <h5>Ограничения по территориям (полный список)</h5>
+   <p>Off-road — везде запрещено. Death Valley — запрет с 1 июня по 30 сентября (температура почвы может достигать 60°C). Мексика — на свой риск, только с MALI, без возмещения за ремонт/потерю аренды. Нью-Йорк/Манхэттен — запрещено полностью. Онтарио/Квебек — нельзя оставлять кэмпер без присмотра в границах Монреаля, Оттавы и Квебек-Сити. Аляска/Северная Канада — на свой риск, без возмещения. Зима — при отрицательных температурах в некоторых локациях кэмпер может быть законсервирован (winterized); переконсервация стоит до $150–200 за счёт арендатора. Лето/жара — работа кондиционера и других систем в экстремальную жару не гарантируется; в закрытой машине на солнце температура может подняться до 55°C, кондиционер снижает температуру примерно на 11°C от температуры воздуха снаружи.</p>
+   <h5>Перед поездкой — чек-лист</h5>
+   <p>Курение запрещено (штраф минимум $250 за уборку). Домашние животные разрешены, доп. уборка может быть платной, повреждения салона — на счёт гостя. Перед выездом — обход кэмпера снаружи, все шланги отсоединены, отсеки закрыты. Один комплект ключей выдаётся — не оставлять в замке зажигания. Если ключи потеряны/заблокированы внутри — все расходы на госте.</p>
+   <h5>Подготовка к движению (Secure the Coach for Travel)</h5>
+   <p>Перед стартом: закрыты все люки и окна, шкафы и ящики закрыты, зафиксированы дверцы холодильника, закрыта дверь ванной, отключены водонагреватель/насос/печь/плита, генератор выключен, ТВ и лестница закреплены, вещи убраны, слайд-ауты задвинуты, тент убран, входная дверь заперта на замок, канализационный выход закрыт, внешние отсеки заперты, система выравнивания убрана (если есть).</p>
+   <h5>Вождение</h5>
+   <p>Габарит по высоте — минимум 12 футов (3.65м) свободного пространства нужно закладывать (кондиционер и антенны на крыше). Повреждение крыши от заезда под низкие объекты — не покрывается, все расходы на госте. Скорость — не превышать лимит; вождение на 10% медленнее лимита помогает экономить топливо и контролировать машину. При спуске — обязательно включать режим TOW/HAUL (кнопка на рычаге КПП или на панели), он автоматически подтормаживает двигателем без перегрева тормозов. Хвост (задняя часть кузова) выступает за колёса — при поворотах может задевать препятствия ("tail swing"). При движении назад — всегда используйте помощника (spotter) снаружи. Школьные автобусы — жёлтые, при мигающих огнях и выехавшем стоп-знаке — полная остановка обязательна в обоих направлениях движения.</p>
+   <h5>Заправка и топливо</h5>
+   <p>Только Regular Unleaded бензин (не дизель!), бак ~208 литров (55 галлонов). Перед заправкой — выключить генератор и закрыть газовый клапан пропана; после — открыть обратно. Возврат — с тем же уровнем топлива, что при получении. При заправке неправильным топливом — немедленно звонить в поддержку, не заводить двигатель.</p>
+   <h5>Аварийный запуск</h5>
+   <p>Если аккумулятор двигателя разряжен — кнопка аварийного запуска слева от водительского сиденья: зажать и удерживать, одновременно повернуть ключ зажигания; если не завелось за 10 секунд — подождать минуту и повторить.</p>
+   <h5>Пропановый баллон</h5>
+   <p>Заправлен полностью при получении. Дозаправка — на некоторых заправках/базах U-Haul/в кемпингах, за счёт арендатора. Перед паромом — обязательно закрыть газовый клапан.</p>
+   <h5>Масло и шины</h5>
+   <p>Проверка уровня масла — обязанность гостя, доливать не более 0.5 кварты за раз, проверять с утра на холодную, машина на ровной поверхности. Замена масла — каждые 7500 миль, типовая стоимость до $100, чеки сохранять для возмещения. При проколе шины — не менять самостоятельно, звонить в поддержку.</p>
+   <h5>Кемпинг — заезд и подключения</h5>
+   <p>Выбирать ровную площадку в тени, вдали от препятствий сверху и снизу (ветки, пни, камни) — всегда со спотером, даже с камерой заднего вида. Для работы потолочного кондиционера нужно подключение минимум 30 Ампер. Электроподключение: 30-амперный кабель к столбу кемпинга, при отсутствии 30А — переходник на 15А (ограничивает одновременную работу приборов). Заправка чистой воды — через шланг в FRESH WATER INTAKE, вода пригодна для мытья/душа, но не для питья — рекомендуется бутилированная. При подключении к городской воде — насос кэмпера выключать.</p>
+   <h5>Диванная/обеденная зона в кровать, ТВ, тент</h5>
+   <p>Есть инструкции по трансформации обеденной группы в спальное место (зависит от модели — с рычагом или без). ТВ работает без гарантии приёма сигнала, техподдержки по ТВ нет. Тент — никогда не оставлять раскрытым без присмотра, в ветер/дождь — обязательно убрать (повреждения на счёт гостя).</p>
+   <h5>Мониторинг систем (панель управления)</h5>
+   <p>Панель показывает уровни: чистая вода, чёрная/серая вода, пропан, состояние аккумулятора (L-низкий, F-удовлетворительно, G-хорошо, C-заряжается). Слайд-аут — работает только при заведённом двигателе и затянутом ручнике; выдвигать/задвигать только на ровной поверхности, до упора (щелчок), не наполовину.</p>
+   <h5>Электросистемы</h5>
+   <p>Три системы: 220/120В от столба кемпинга или генератора (для СВЧ, кондиционера, розеток), два 12-вольтовых аккумулятора (двигателя и салона). Полная зарядка салонного аккумулятора может занимать более 4 часов от генератора/сети. Не рекомендуется полагаться только на подзарядку от двигателя долгое время.</p>
+   <h5>Генератор</h5>
+   <p>Даёт 220/120В без подключения к сети кемпинга. Требуется прогрев 3-4 минуты перед включением техники. Расход — около галлона топлива в час, требует минимум 1/4 бака в основном баке. Не использовать ночью/в тихие часы кемпинга. Проверка масла — каждые 8 часов работы.</p>
+   <h5>Печь и водонагреватель</h5>
+   <p>Печь — газовая, для экономии заряда аккумулятора лучше подключаться к сети кемпинга. Водонагреватель работает от газа и/или электричества (при подключении к сети) — не включать одновременно с кондиционером и СВЧ, иначе может выбить автомат.</p>
+   <h5>Холодильник, плита, душ, туалет</h5>
+   <p>Холодильнику требуется до 6 часов на охлаждение после включения, рекомендуемая настройка — среднее значение. Плита — обязательна вентиляция (открыть окно/вытяжку) при готовке. Душ — экономная кнопка регулировки потока. Туалет — специальная туалетная бумага для RV, не смывать влажные салфетки/средства гигиены — забивают баки.</p>
+   <h5>Слив баков (Dumping)</h5>
+   <p>Только на специальных станциях слива. Порядок: сначала клапан BLACK (полное опустошение) → промывка чистой водой → закрыть → затем клапан GREY (промывает шланг) → закрыть → септик-таблетка в унитаз + немного воды. Лучше сливать, когда баки заполнены более чем на 2/3.</p>
+   <h5>Системы безопасности</h5>
+   <p>Дымовой извещатель, датчик пропана/угарного газа, огнетушитель — их местоположение нужно найти сразу при получении. При срабатывании сигнала — остановить машину, заглушить двигатель, отключить аккумулятор, перекрыть газ, открыть окна и двери, покинуть салон.</p>
+   <h5>При аварии или поломке</h5>
+   <p>Обязательно вызвать полицию при ДТП и получить официальный протокол — без него страховка VIP/RLI/SLI не действует. Roadside Support (24/7): +1-800-367-4707. При поломке — не продолжать эксплуатацию до согласования с поддержкой. Мелкий ремонт до $75 (в оригинальном Guest Guide на английском указана иная цифра $100, но подписываемый на месте Rental Contract прямо называет $75 — ориентируйтесь на контракт) — можно проводить самостоятельно, сохраняя чеки. Никогда не бросать кэмпер на дороге.</p>
+   <h5>Возврат кэмпера</h5>
+   <p>Приём с 08:00 до 11:00 (часы могут отличаться зимой). Опоздание — дополнительная плата. Требования: чистый салон (пол — просто подметён, без мытья), посуда вымыта и убрана, баки слиты, мусор вынесен, топливо на уровне получения, газовый баллон полон (если не был предоставлен стартовый набор — иначе он уже включён), опустошение бака с чистой водой не требуется. Проверьте все шкафы на личные вещи перед сдачей.</p>`},
+
+  {title:'Rental Contract — Terms and Conditions', lang:'EN', meta:'El Monte Rents, Inc. · подписывается на месте при получении',
+   body:`<h4>Что это</h4>
+   <p>Юридически обязывающий договор, который вы подпишете физически на стойке El Monte в день получения — имеет приоритет над всеми предыдущими договорённостями и описаниями (включая Guest Guide и польские сокращённые условия).</p>
+   <h4>Самое важное, на что обратить внимание при подписании</h4>
+   <ul>
+   <li><b>Лимит ремонта без согласования: $75</b> (не $100 — это разночтение с англ. Guest Guide, ориентируйтесь на цифру из этого контракта)</li>
+   <li><b>Штраф за опоздание при возврате:</b> $50/час после 11:00, максимум — двойной дневной тариф</li>
+   <li><b>Полные баки при возврате:</b> бензин + недостача = двойная рыночная цена за галлон</li>
+   <li><b>Толлы и штрафы:</b> вы несёте ответственность за все, включая наложенные внешними агентствами — $25 админсбор за каждый случай</li>
+   <li><b>VIP-страховка (франшиза $1000) аннулируется</b> при: движении по грунтовым дорогам, вождении в нетрезвом виде, повреждении слайд-аута, невнимательном вождении, нарушении условий контракта</li>
+   <li><b>Запрещённые зоны без письменного разрешения:</b> за пределами 48 смежных штатов США/провинций Канады (кроме Ньюфаундленда)</li>
+   <li><b>Аварии:</b> обязательно официальный Police Report — без него аннулируется VIP/RLI/SLI покрытие</li>
+   <li><b>Claims (претензии на компенсацию):</b> подать в письменном виде <b>в течение 45 дней</b> после возврата кэмпера — позже не примут</li>
+   <li><b>При поломке:</b> нельзя продолжать эксплуатацию неисправного кэмпера до ремонта/замены — на свой риск</li>
+   </ul>
+   <div class="doc-note">Это сокращённый перевод самых операционно важных пунктов из 21-страничного контракта. Полный текст на английском — обязательно проговорите на месте с сотрудником El Monte, если что-то неясно, до подписания.</div>`,
+   full:`<h4>Развёрнутый перевод по пунктам контракта (21 раздел)</h4>
+   <h5>1. Природа контракта</h5>
+   <p>Контракт создаёт отношения хранения/пользования (bailment) — кэмпер остаётся собственностью Lessor (El Monte Rents, Inc., Калифорния), Renter (арендатор) лишь пользуется им на условиях контракта. Без письменного согласия El Monte запрещено передавать права по контракту третьим лицам или отдавать кэмпер в субаренду.</p>
+   <h5>2. Определения</h5>
+   <p>Renter — это подписант + все указанные в приложении доп. водители + все пассажиры; юридически все они несут солидарную ответственность. Lessor — El Monte Rents, Inc. и связанные лица. Расшифровки страховок: VIP (Vehicle Incident Protection), RLI (Rental Liability Insurance), SLI (Supplemental Liability Insurance), MALI (Mexico Auto Liability Insurance).</p>
+   <h5>3. Кто может управлять кэмпером</h5>
+   <p>Только Renter и водители, вписанные в приложение "Authorized Drivers" — каждому должно быть не менее 21 года (в отдельных локациях — старше), с действующими правами.</p>
+   <h5>4. Обязанности арендатора</h5>
+   <p>Все данные, предоставленные Lessor, должны быть достоверны. Арендатор обязан пройти инструктаж по эксплуатации всех систем при получении. Соблюдать законы о ремнях безопасности и детских креслах. <b>Ремонт свыше $75 — только с телефонным согласованием поддержки (1-800-367-4707)</b>; при неисправности — немедленно прекратить использование. При аварии — обязателен полицейский протокол в течение 5 дней + звонок в поддержку в течение 24 часов или до возврата кэмпера (что раньше). Несоблюдение этого пункта лишает права на страховое покрытие VIP/RLI/SLI/MALI. При краже — немедленно заявить в полицию и Lessor. Ездить только по асфальтированным дорогам, останавливаться и ночевать только в безопасных местах, кэмпер всегда закрывать на замок с изъятыми ключами. Проверка детекторов дыма/газа/угарного газа — ежедневная обязанность арендатора, включая замену батареек при необходимости. Ежедневная проверка света, шин, двигателя, выхлопа генератора, зеркал.</p>
+   <h5>Возврат кэмпера</h5>
+   <p>Кэмпер должен быть возвращён в том же состоянии, в дату и время, указанные на Page A контракта, в указанном месте. Просрочка — почасовой тариф за опоздание. Арендатор несёт ответственность за все штрафы, толлы, парковочные нарушения, включая наложенные внешними агентствами — плюс административный сбор минимум $25 за каждый случай.</p>
+   <h5>5. Ответственность за утрату/повреждение кэмпера</h5>
+   <p>Арендатор отвечает за любую утрату/повреждение кэмпера независимо от вины — в пределах рыночной стоимости, минус ликвидационная стоимость, плюс расходы на эвакуацию/хранение. При использовании кэмпера согласно условиям контракта: страховка арендатора первична; Lessor может предложить вторичное покрытие с максимальной франшизой за случай. <b>Полностью на арендаторе, независимо от вины, следующие типы повреждений:</b> повреждения сверху (крыша), повреждения снизу (ступени, шины, колёса), повреждения от бездорожья, перегрев/замерзание систем, повреждения при движении задним ходом, любая авария из-за умышленного нарушения закона/вождения в состоянии опьянения, повреждение слайд-аута, повреждения из-за отсутствия должного обслуживания, невнимательное вождение (включая засыпание за рулём), небрежность арендатора, любые внутренние повреждения салона.</p>
+   <h5>6. Запрещённое использование кэмпера</h5>
+   <p>Полный список того, что запрещено: небрежная/неосторожная эксплуатация; нарушение любых законов; буксировка чего-либо без письменного разрешения (максимум 3000 фунтов, если разрешено); передача управления не указанным в контракте лицам; вождение в плохую погоду/по плохим дорогам; проезд через тоннели с ограничением на пропан; выезд за пределы 48 смежных штатов США или провинций Канады (кроме Ньюфаундленда) без письменного разрешения (Мексика/Аляска/Юкон/Северо-Западные территории — только с предварительным письменным пермитом); вождение в состоянии опьянения; перевозка больше людей, чем ремней безопасности; вмешательство в одометр/спидометр; перевозка людей/имущества за плату; участие в гонках/тестах; использование во время забастовок/беспорядков; эксплуатация кэмпера, полученного обманным путём; перевозка взрывчатки/опасных материалов; езда по грунтовым/лесным дорогам; повреждающая эксплуатация; продолжение эксплуатации при явных признаках неисправности (приборы, спущенные шины, дым, необычный шум); перевозка людей в багажном отсеке или отсоединение камперной части от шасси; размещение людей/предметов на крыше; движение с незакреплённым грузом или невтянутыми ступенями; наклейки/вывески/громкоговорители на кэмпере; дальнейшая эксплуатация после аварии до официального ремонта; <b>поездка в Долину Смерти в июле и августе полностью запрещена</b> (в июне и сентябре разрешена, но арендатор полностью отвечает за любые механические проблемы/эвакуацию, температура почвы может достигать 60°C); засыпание или иное невнимательное вождение.</p>
+   <h5>7. Оплата применимых сборов</h5>
+   <p>Арендатор оплачивает по требованию: время и пробег; сборы за VIP/RLI/SLI/MALI, если выбраны; базовое обслуживание, доп. водители, топливо, генератор, подготовка, наборы, one-way сборы; чистка при возврате в грязном виде; минимальный сбор за неопустошённые баки ("flush out fee"); ремонт из-за небрежности/неправильной эксплуатации; налоги и сборы; штрафы, если возникли по вине арендатора; сборы за вмешательство в спидометр; <b>сбор $1000</b> за возврат кэмпера вне рабочих часов станции; <b>сбор $5000</b> при оставлении/абандоне кэмпера.</p>
+   <h5>8. Неуплата сборов</h5>
+   <p>При неуплате — Lessor вправе взыскать расходы на адвоката/коллекторов, начислять проценты на непогашенную сумму по максимальной законной ставке, списывать средства с указанной арендатором кредитной карты.</p>
+   <h5>9. Возвратный депозит</h5>
+   <p>Гарантия исполнения условий контракта. Оплачивается при получении, только основная кредитная карта (не дебетовая, не наличные, не чек).</p>
+   <h5>10. Ограничения ответственности Lessor</h5>
+   <p>Lessor не несёт ответственности за задержки/досрочные возвраты/отмены по любым причинам (погода, поломка, авария, кража, болезнь). Не отвечает за косвенные/случайные убытки. При механической поломке максимальная ответственность Lessor — возврат суточной платы за период простоя; поломка радио, ТВ, кондиционера, холодильника, СВЧ, круиз-контроля или генератора <b>не считается механической поломкой</b> для целей этого пункта. Lessor не отвечает за имущество арендатора.</p>
+   <h5>11. Возмещение и освобождение от ответственности</h5>
+   <p>Арендатор принимает на себя всю ответственность за эксплуатацию кэмпера независимо от вины (включая частичную вину Lessor), отказывается от претензий к Lessor за травмы/убытки в ходе аренды, обязуется защищать Lessor от претензий третьих лиц. При поломке — вся дальнейшая эксплуатация кэмпера до ремонта происходит исключительно на риск арендатора.</p>
+   <h5>12. Страхование — обязанность арендатора</h5>
+   <p>Арендатор обязан поддерживать автостраховку с покрытием телесных повреждений, имущественного ущерба, защиты от незастрахованных водителей и КАСКО на кэмпер, минимум по требованиям штата/провинции. Страховка Lessor (если применяется) — только сверх минимума, вторична. Страховка Lessor действует только в США и Канаде; для Мексики нужно письменное разрешение и отдельная страховка. Любое нарушение контракта аннулирует всё страховое покрытие.</p>
+   <h5>13. VIP — Vehicle Incident Protection</h5>
+   <p>Снижает финансовую ответственность арендатора до размера франшизы <b>$1000 за случай</b> (у вас — обнулено до $0 по VIP Plus Upgrade, при условии соблюдения контракта). Юрисдикция — США и Канада. <b>VIP не действует</b> при: повреждениях сверху (включая тенты), снизу (ступени, шины, колёса), от бездорожья, перегрева/замерзания систем, движения задним ходом, умышленного нарушения закона/вождения в опьянении, повреждения слайд-аута, ненадлежащего обслуживания, невнимательного вождения. Не покрывает вандализм, повреждение лобового стекла, внутренние повреждения салона.</p>
+   <h5>14. RLI — Rental Liability Insurance</h5>
+   <p>Опциональная страховка гражданской ответственности до минимальных лимитов штата/провинции. Без франшизы. Не действует при нарушении контракта, вождении в опьянении, использовании неавторизованным водителем.</p>
+   <h5>15. SLI — Supplemental Liability Insurance</h5>
+   <p><b>У вас включена</b> в резервацию. Расширяет покрытие гражданской ответственности до <b>$1 000 000</b>, действует сверх базового покрытия. Без франшизы. Исключения аналогичны RLI.</p>
+   <h5>16. MALI — Mexico Auto Liability Insurance</h5>
+   <p>Не относится к вашей поездке (нет заездов в Мексику), актуально только при доп. разрешении на выезд туда.</p>
+   <h5>17. Прочие положения</h5>
+   <p>Контракт — юридически обязывающий документ, есть право на независимую юридическую консультацию до подписания. Споры разрешаются через арбитраж (JAMS) в штате/провинции, где подписан контракт, а не по месту первоначальной резервации.</p>
+   <h5>18. Приём кэмпера при возврате (check-in)</h5>
+   <p>Кэмпер должен быть освобождён до 11:00 в день сдачи. Опоздание — $50/час (максимум — двойная суточная ставка). На некоторых станциях — шаттлы к аэропорту в 8:00 и 12:00 (при опоздании — транспорт за счёт гостя). Баки должны быть слиты и промыты, иначе минимум $75 штрафа. Бак топлива — полный, иначе недостача считается по двойной рыночной цене за галлон. Возврат раньше срока — деньги за неиспользованные дни не возвращаются. Арендатор отвечает за все толлы/штрафы, включая внешние — плюс $25 админсбор за каждый. Не отвечает Lessor за оставленные вещи. Уборка — по тарифу текущей ставки станции возврата, если кэмпер не в чистом состоянии.</p>
+   <h5>19. Обслуживание и ответственность арендатора</h5>
+   <p>Несоблюдение инструкций Lessor по эксплуатации = неправильное использование, ответственность за это — на арендаторе. Обязательна проверка масла при каждой заправке, уровня охлаждающей жидкости и давления шин по утрам "на холодную". Арендатор отвечает за механические повреждения от небрежной эксплуатации (низкий уровень масла и т.п.) и за перевозку большего числа людей, чем предусмотрено ремнями безопасности.</p>
+   <h5>20. Горячая линия On-the-Road Support: 800-367-4707</h5>
+   <p>Арендатор вправе самостоятельно провести ремонт до $75 с возмещением по чеку. Свыше $75 — обязательно согласование по телефону до начала ремонта; расходы на сотовую связь не возмещаются. Обязательно звонить на горячую линию и следовать всем рекомендациям для права на компенсацию. Претензии на компенсацию подаются в письменном виде <b>не позднее 45 дней</b> после возврата кэмпера — позже не принимаются. Поломка отдельных удобств (радио, ТВ, кассетный проигрыватель, круиз-контроль, электроника) не считается полной потерей функциональности кэмпера и не компенсируется.</p>
+   <h5>21. Поездки в Мексику, Канаду, Аляску</h5>
+   <p>Страховка США недействительна в Мексике. Нужна MALI, оформленная заранее у Lessor. Lessor не принимает чеки/звонки по ремонту, совершённому в Мексике. Арендатор полностью отвечает за все поломки в Мексике, Северной Канаде и на Аляске.</p>`},
+
+  {title:'Toll Roads — платные дороги (справка El Monte)', lang:'EN/PL', meta:'Обновлено 25.01.2023',
+   body:`<h4>Что это</h4>
+   <p>Справка от El Monte по платным дорогам США — у кэмперов нет транспондеров (FasTrak/EZPass/SunPass), все толлы — на ответственности арендатора.</p>
+   <h4>Актуально для вашего маршрута</h4>
+   <ul>
+   <li><b>Калифорния (Лос-Анджелес):</b> только электронная оплата, San Francisco Bay Area / Orange County — оплата онлайн в течение 5 дней при случайном заезде</li>
+   <li><b>Техас (Даллас):</b> NTTA — <a href="http://www.ntta.org" target="_blank">ntta.org</a></li>
+   <li><b>Флорида:</b> только электронная оплата (SunPass), можно арендовать транспондер в филиале El Monte Orlando, если решите чаще пользоваться платными</li>
+   </ul>
+   <p>Полный список штатов и ссылок для ручной оплаты — в разделе "Справочник" этого приложения.</p>`,
+   full:`<h4>Полный перевод справки по платным дорогам</h4>
+   <p><b>Арендатор отвечает за все дорожные сборы.</b> Чтобы избежать штрафных начислений (толл + пеня + $25 сбор за обработку за каждый толл), El Monte предоставляет следующую информацию по штатам на маршруте (и другим популярным штатам — для общей ориентации):</p>
+   <h5>Калифорния</h5>
+   <p>Мосты района Сан-Франциско: только электронная оплата — bayareafastrak.org. Округ Ориндж и Сан-Диего: только электронно, оплатить нужно в течение 5 дней — thetollroads.com/help/pay (запомните названия въезда/выезда с трассы).</p>
+   <h5>Денвер (Колорадо)</h5>
+   <p>E-470 — только электронная оплата, e-470.com.</p>
+   <h5>Флорида</h5>
+   <p>От Майами до Ки-Уэста — только электронно, sunpass.com. Транспондер можно арендовать в филиале El Monte Orlando. Остальные платные дороги штата принимают наличные.</p>
+   <h5>Индиана</h5>
+   <p>I-80/I-90 — ezpassin.com.</p>
+   <h5>Иллинойс</h5>
+   <p>I-39/I-80/I-88/I-90/I-94/I-294/I-355 — getipass.com.</p>
+   <h5>Мэн</h5>
+   <p>Turnpikes — maineturnpike.com.</p>
+   <h5>Массачусетс</h5>
+   <p>Мосты, тоннели, turnpike — massdot.state.ma.us/highway/Main.aspx.</p>
+   <h5>Нью-Джерси</h5>
+   <p>Turnpike и Garden State Parkway — state.nj.us/turnpike/index.html.</p>
+   <h5>Нью-Йорк</h5>
+   <p>I-87/I-90 (Thruway) — thruway.ny.gov/index.shtml.</p>
+   <h5>Северная Каролина</h5>
+   <p>Toll 147 и Toll 540 — только электронно, работает с EZPass или Sunpass/Florida.</p>
+   <h5>Огайо</h5>
+   <p>I-80/I-90 (Turnpike) — ohioturnpike.org.</p>
+   <h5>Оклахома</h5>
+   <p>Все Turnpike штата (Cherokee, Chickasaw, Cimarron, Creek, HE Bailey, Indian Nation, Kilpatrick, Muskogee, Turner, Will Rogers) — pikepass.com.</p>
+   <h5>Пенсильвания</h5>
+   <p>I-70/I-76/I-276/I-476 (Turnpike) — paturnpike.com. Мосты Филадельфии — drpa.org/index.asp.</p>
+   <h5>Техас</h5>
+   <p>Даллас — ntta.org. Хьюстон — hctra.org.</p>
+   <h5>Вашингтон (штат)</h5>
+   <p>Мост Seattle State Route 520 — wsdot.wa.gov/tolling/520/.</p>
+   <p><i>Информация от El Monte может быть неполной и устареть после публикации — при сомнениях уточняйте у оператора конкретной платной дороги.</i></p>`},
+];
+
+const checklist = {
+  'До вылета': [
+    'МВУ — 3 водителя (не Ярослав), отделение Wilanów, Klimczaka 2',
+    'Забронировать Miami Everglades RV Resort',
+    'Забронировать The Big Texan Steak Ranch (ужин) + позвонить за лимузином',
+    'Купить билеты Preservation Hall (Big Shot VIP)',
+    'Забронировать Private Airboat Tour (Новый Орлеан)',
+    'Забронировать Fort Worth Stockyards (день отдыха в Далласе)',
+    'Туристическая страховка (если решили брать)',
+  ],
+  'Документы на приёмку кэмпера': [
+    'Физические права всех 4 водителей',
+    'МВУ (3 шт.)',
+    'Загранпаспорта (4 шт.)',
+    'Кредитная карта главного водителя (депозит $1500)',
+  ],
+  'Self Check-In El Monte': [
+    'Пройти онлайн Self Check-In за 30 дней до выезда (~26.06)',
+    'Выбрать точный слот получения кэмпера',
+  ],
+  'Перед первым выездом из ЛА': [
+    'Закупка в Walmart (RV toilet paper, химия для баков, посуда, постельное)',
+    'Включить "Avoid tolls" в навигаторе',
+    'Проверить давление в шинах "на холодную"',
+  ],
+};
+
+/* ============ RENDER ============ */
+
+function daysUntil(){
+  const now = new Date();
+  const total = (TRIP_END - TRIP_START) / 86400000;
+  if(now < TRIP_START){
+    const d = Math.ceil((TRIP_START - now)/86400000);
+    return {status:'before', d, total};
+  } else if(now > TRIP_END){
+    return {status:'after', d:0, total};
+  } else {
+    const d = Math.floor((now - TRIP_START)/86400000)+1;
+    return {status:'during', d, total};
+  }
+}
+
+function linkifyAddresses(root){
+  root.querySelectorAll('.addr').forEach(elm=>{
+    if(elm.dataset.linked) return;
+    elm.dataset.linked = '1';
+    const text = elm.textContent;
+    const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(text);
+    elm.innerHTML = `<a href="${url}" target="_blank" rel="noopener">📍 ${text}</a>`;
+  });
+}
+
+function renderOdometer(){
+  const info = daysUntil();
+  const numEl = document.getElementById('dayNum');
+  const fillEl = document.getElementById('odoFill');
+  const statusEl = document.getElementById('odoStatus');
+  const sideEl = document.getElementById('odoSide');
+  if(info.status==='before'){
+    numEl.textContent = info.d;
+    sideEl.innerHTML = 'дней до <b>старта</b>';
+    fillEl.style.width = '0%';
+    statusEl.textContent = 'ещё в пути к старту';
+  } else if(info.status==='during'){
+    numEl.textContent = info.d;
+    sideEl.innerHTML = '<b>день ' + info.d + '</b> из ' + Math.round(info.total);
+    fillEl.style.width = Math.min(100, (info.d/info.total)*100) + '%';
+    statusEl.textContent = 'в пути';
+  } else {
+    numEl.textContent = '✓';
+    sideEl.innerHTML = '<b>поездка завершена</b>';
+    fillEl.style.width = '100%';
+    statusEl.textContent = 'финиш';
+  }
+}
+
+let doneDays = {};
+
+async function loadDoneDays(){
+  try{
+    const res = await window.storage.get('done-days', true);
+    if(res && res.value) doneDays = JSON.parse(res.value);
+  }catch(e){ doneDays = {}; }
+  renderDays();
+}
+
+async function saveDoneDays(){
+  try{ await window.storage.set('done-days', JSON.stringify(doneDays), true); }
+  catch(e){ console.error('save done-days failed', e); }
+}
+
+function renderDays(){
+  const el = document.getElementById('days');
+  const order = days.map((d,i)=>i).sort((a,b)=>{
+    const da = !!doneDays[a], db = !!doneDays[b];
+    if(da===db) return a-b;
+    return da ? 1 : -1;
+  });
+  el.innerHTML = order.map(i=>{
+    const d = days[i];
+    const tagHtml = d.tag==='booked' ? '<span class="tag booked">забронировано</span>'
+                  : d.tag==='pending' ? '<span class="tag pending">есть незабронированное</span>'
+                  : d.tag==='risk' ? '<span class="tag risk">важно проверить</span>' : '';
+    const isDone = !!doneDays[i];
+    return `<div class="day ${isDone?'done':''}" data-i="${i}">
+      <div class="day-marker">
+        <div class="day-num">${d.n}</div>
+        <div class="day-done-btn" data-toggle="${i}" title="Отметить день пройденным">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>
+        </div>
+      </div>
+      <div class="day-content">
+        <div class="day-date">${d.date}</div>
+        <div class="day-title">${d.title}${tagHtml}</div>
+        <div class="day-summary">${d.summary}</div>
+        <div class="day-detail">${d.detail}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.day').forEach(dayEl=>{
+    dayEl.querySelector('.day-content').addEventListener('click',()=>{
+      dayEl.classList.toggle('open');
+    });
+  });
+  el.querySelectorAll('.day-done-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const idx = btn.dataset.toggle;
+      doneDays[idx] = !doneDays[idx];
+      saveDoneDays();
+      renderDays();
+    });
+  });
+  linkifyAddresses(el);
+}
+
+function renderBookings(){
+  const okEl = document.getElementById('bookings-ok');
+  okEl.innerHTML = bookingsOk.map((b,i)=>`
+    <div class="card ok" data-i="${i}">
+      <div class="card-top"><div class="card-title"><span class="status-dot ok"></span>${b.title}</div><div class="card-date">${b.date}</div></div>
+      <div class="card-body">${b.detail}</div>
+      ${b.full? `<div class="card-full">${b.full}</div><div class="expand-hint">нажмите, чтобы свернуть</div>` : ''}
+    </div>`).join('');
+  okEl.querySelectorAll('.card').forEach(c=>{
+    if(bookingsOk[c.dataset.i].full){
+      c.addEventListener('click', ()=>c.classList.toggle('open'));
+    }
+  });
+  document.getElementById('bookings-todo').innerHTML = bookingsTodo.map(b=>`
+    <div class="card todo">
+      <div class="card-top"><div class="card-title"><span class="status-dot todo"></span>${b.title}</div>${b.urgent?'<span class="tag risk">срочно</span>':''}</div>
+      <div class="card-body">${b.detail}</div>
+    </div>`).join('');
+  linkifyAddresses(okEl);
+  linkifyAddresses(document.getElementById('bookings-todo'));
+}
+
+function renderFuel(){
+  const el = document.getElementById('fuel-stops');
+  el.innerHTML = fuelStops.map(f=>`
+    <div class="ref-card">
+      <h3>${f.day} — <span class="addr">${f.place}</span></h3>
+      <p>${f.why}</p>
+    </div>
+  `).join('');
+  linkifyAddresses(el);
+}
+
+function renderContacts(){
+  const el = document.getElementById('contacts-list');
+  el.innerHTML = contacts.map(g=>`
+    <div class="ref-card">
+      <h3>${g.group}</h3>
+      ${g.items.map(c=>`<p><b>${c.name}</b><br>${c.phone!=='—'?`<span class="phone">${c.phone}</span>`:'см. переписку'}${c.extra?' · '+c.extra:''}</p>`).join('')}
+    </div>
+  `).join('');
+}
+
+function renderDocuments(){
+  const el = document.getElementById('documents');
+  el.innerHTML = documents.map((d,i)=>`
+    <div class="doc-card" data-i="${i}">
+      <div class="doc-head">
+        <div class="doc-head-left">
+          <span class="doc-lang">${d.lang}</span>
+          <div>
+            <div class="doc-title">${d.title}</div>
+            <div class="doc-meta">${d.meta}</div>
+          </div>
+        </div>
+        <div class="doc-chevron">▾</div>
+      </div>
+      <div class="doc-body">${d.body}
+        ${d.full ? `<div class="doc-full-toggle">Читать полностью на русском ⤵</div><div class="doc-full-text">${d.full}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.doc-head').forEach(h=>{
+    h.addEventListener('click', ()=>h.closest('.doc-card').classList.toggle('open'));
+  });
+  el.querySelectorAll('.doc-full-toggle').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const txt = btn.nextElementSibling;
+      txt.classList.toggle('open');
+      btn.textContent = txt.classList.contains('open') ? 'Свернуть перевод ⤴' : 'Читать полностью на русском ⤵';
+    });
+  });
+  linkifyAddresses(el);
+}
+
+function renderReference(){
+  const el = document.getElementById('reference-content');
+  el.innerHTML = reference.map(r=>`
+    <div class="ref-card"><h3>${r.h}</h3><p>${r.body}</p></div>
+  `).join('');
+  linkifyAddresses(el);
+}
+
+let checkState = {};
+
+async function loadCheckState(){
+  try{
+    const res = await window.storage.get('checklist-state', true);
+    if(res && res.value) checkState = JSON.parse(res.value);
+  }catch(e){ checkState = {}; }
+  renderChecklist();
+}
+
+async function saveCheckState(){
+  const statusEl = document.getElementById('saveStatus');
+  try{
+    await window.storage.set('checklist-state', JSON.stringify(checkState), true);
+    statusEl.textContent = 'сохранено · видно всей семье';
+    setTimeout(()=>{ if(statusEl.textContent==='сохранено · видно всей семье') statusEl.textContent=''; }, 2000);
+  }catch(e){
+    statusEl.textContent = 'не удалось сохранить — попробуйте ещё раз';
+  }
+}
+
+function renderChecklist(){
+  const el = document.getElementById('checklist-content');
+  el.innerHTML = Object.entries(checklist).map(([group, items])=>`
+    <div class="checklist-group">
+      <h3>${group}</h3>
+      ${items.map((item,idx)=>{
+        const key = group+'::'+idx;
+        const done = !!checkState[key];
+        return `<div class="check-item ${done?'done':''}" data-key="${key}">
+          <div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="#14181f" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div>
+          <div class="check-label">${item}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+  el.querySelectorAll('.check-item').forEach(itemEl=>{
+    itemEl.addEventListener('click', ()=>{
+      const key = itemEl.dataset.key;
+      checkState[key] = !checkState[key];
+      itemEl.classList.toggle('done');
+      saveCheckState();
+    });
+  });
+}
+
+/* ============ NAV ============ */
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+/* ============ INIT ============ */
+renderOdometer();
+loadDoneDays();
+renderBookings();
+renderFuel();
+renderContacts();
+renderDocuments();
+renderReference();
+loadCheckState();
+
+/* ============ PWA: SERVICE WORKER ============ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
